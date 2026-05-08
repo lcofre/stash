@@ -10,16 +10,16 @@ db.version(1).stores({
 })
 
 export const DEFAULT_CATEGORIES = [
-  { name: 'To Watch',    type: 'watch',    icon: '🎬', color: '#6366f1', order: 0 },
-  { name: 'To Read',     type: 'read',     icon: '📚', color: '#10b981', order: 1 },
-  { name: 'To Research', type: 'research', icon: '🔍', color: '#f59e0b', order: 2 },
-  { name: 'To Do',       type: 'todo',     icon: '✅', color: '#3b82f6', order: 3 },
-  { name: 'To Buy',      type: 'buy',      icon: '🛒', color: '#ec4899', order: 4 },
+  { name: 'To Watch',    type: 'watch',    icon: '🎬', color: '#9B7FBD', order: 0 },
+  { name: 'To Read',     type: 'read',     icon: '📚', color: '#5A9E7E', order: 1 },
+  { name: 'To Research', type: 'research', icon: '🔍', color: '#C9913E', order: 2 },
+  { name: 'To Do',       type: 'todo',     icon: '✅', color: '#6B9BD4', order: 3 },
+  { name: 'To Buy',      type: 'buy',      icon: '🛒', color: '#C4767A', order: 4 },
 ]
 
 export const CATEGORY_COLORS = [
-  '#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899',
-  '#8b5cf6', '#f97316', '#14b8a6', '#ef4444', '#64748b',
+  '#9B7FBD', '#6B9BD4', '#5A9E7E', '#C9913E', '#C4767A',
+  '#7BBDB4', '#D4A05A', '#8FB87B', '#B87B9E', '#8A8A9E',
 ]
 
 export const CATEGORY_ICONS = [

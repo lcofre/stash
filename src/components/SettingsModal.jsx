@@ -1,10 +1,16 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Trash2, Plus, GripVertical, Eye, EyeOff, Download, Upload, UserPlus, LogOut } from 'lucide-react'
+import { Trash2, Plus, Eye, EyeOff, Download, Upload, UserPlus } from 'lucide-react'
 import Modal from './ui/Modal.jsx'
 import { db, createProfile, CATEGORY_COLORS, CATEGORY_ICONS, exportProfile, importProfile } from '../db/index.js'
 
 const TABS = ['Categories', 'Profiles', 'API Keys', 'Data']
+
+const label = (text) => (
+  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+    {text}
+  </span>
+)
 
 // ── Category Manager ────────────────────────────────────────────────────────
 
@@ -23,10 +29,7 @@ function CategoryManager({ profileId }) {
   async function addCategory() {
     if (!newName.trim()) return
     const maxOrder = Math.max(0, ...(categories?.map(c => c.order) || []))
-    await db.categories.add({
-      profileId, name: newName.trim(), icon: newIcon,
-      color: newColor, type: newType, order: maxOrder + 1,
-    })
+    await db.categories.add({ profileId, name: newName.trim(), icon: newIcon, color: newColor, type: newType, order: maxOrder + 1 })
     setNewName(''); setAdding(false)
   }
 
@@ -37,82 +40,97 @@ function CategoryManager({ profileId }) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {(categories || []).map((cat, i) => (
-        <div key={cat.id} className="flex items-center gap-3 p-3 bg-slate-800 rounded-xl border border-slate-700">
-          <span className="text-xl">{cat.icon}</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-100">{cat.name}</p>
-            <p className="text-xs text-slate-500 capitalize">{cat.type}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {(categories || []).map(cat => (
+        <div key={cat.id} style={{
+          display: 'flex', alignItems: 'center', gap: '12px',
+          padding: '11px 14px',
+          background: 'var(--bg-3)', border: '1px solid var(--border)',
+          borderLeft: `3px solid ${cat.color}`,
+          borderRadius: 'var(--radius)',
+        }}>
+          <span style={{ fontSize: '18px' }}>{cat.icon}</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontFamily: 'var(--font-ui)', fontSize: '14px', color: 'var(--text)', margin: 0 }}>{cat.name}</p>
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-4)', margin: 0, letterSpacing: '0.05em' }}>{cat.type}</p>
           </div>
-          <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
-          <button
-            onClick={() => deleteCategory(cat.id)}
-            className="text-slate-600 hover:text-red-400 transition-colors p-1"
-          >
+          <button onClick={() => deleteCategory(cat.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-4)', padding: '4px', transition: 'color 0.15s ease' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#C47B7A'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-4)'}>
             <Trash2 size={14} />
           </button>
         </div>
       ))}
 
       {adding ? (
-        <div className="flex flex-col gap-3 p-4 bg-slate-800 rounded-xl border border-indigo-500/50">
-          <div className="flex gap-3">
-            {/* Icon picker */}
-            <div className="flex flex-wrap gap-1 max-w-[180px]">
+        <div style={{ padding: '14px', background: 'var(--bg-3)', border: '1px solid var(--border-2)', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              {label('name')}
+              <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Category name" autoFocus className="field accent-focus" style={{ fontSize: '14px' }} />
+            </div>
+          </div>
+          <div>
+            {label('type')}
+            <select value={newType} onChange={e => setNewType(e.target.value)}
+              className="field"
+              style={{ cursor: 'pointer' }}>
+              <option value="todo">General todo</option>
+              <option value="watch">Watch (movies/TV)</option>
+              <option value="read">Read (books)</option>
+              <option value="research">Research (URLs)</option>
+              <option value="buy">Buy (shopping)</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div>
+            {label('icon')}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
               {CATEGORY_ICONS.map(ic => (
-                <button key={ic} onClick={() => setNewIcon(ic)}
-                  className={`text-lg p-1 rounded transition-all ${newIcon === ic ? 'bg-slate-600 scale-110' : 'hover:bg-slate-700'}`}>
+                <button key={ic} type="button" onClick={() => setNewIcon(ic)}
+                  style={{
+                    fontSize: '18px', padding: '5px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+                    background: newIcon === ic ? 'var(--bg-5)' : 'transparent',
+                    transform: newIcon === ic ? 'scale(1.15)' : 'none',
+                    transition: 'all 0.12s ease',
+                  }}>
                   {ic}
                 </button>
               ))}
             </div>
-            <div className="flex-1 flex flex-col gap-2">
-              <input
-                value={newName}
-                onChange={e => setNewName(e.target.value)}
-                placeholder="Category name"
-                autoFocus
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 focus:border-indigo-500 rounded-lg text-slate-100 placeholder-slate-500 text-sm"
-              />
-              <select
-                value={newType}
-                onChange={e => setNewType(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 text-sm"
-              >
-                <option value="todo">General todo</option>
-                <option value="watch">Watch (movies/TV)</option>
-                <option value="read">Read (books)</option>
-                <option value="research">Research (URLs)</option>
-                <option value="buy">Buy (shopping)</option>
-                <option value="custom">Custom</option>
-              </select>
+          </div>
+          <div>
+            {label('color')}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {CATEGORY_COLORS.map(c => (
+                <button key={c} type="button" onClick={() => setNewColor(c)}
+                  style={{
+                    width: '24px', height: '24px', borderRadius: '50%', border: 'none', cursor: 'pointer',
+                    background: c,
+                    outline: newColor === c ? `2px solid ${c}` : 'none',
+                    outlineOffset: '2px',
+                    transform: newColor === c ? 'scale(1.12)' : 'none',
+                    transition: 'all 0.12s ease',
+                  }} />
+              ))}
             </div>
           </div>
-          {/* Color picker */}
-          <div className="flex gap-2 flex-wrap">
-            {CATEGORY_COLORS.map(c => (
-              <button key={c} onClick={() => setNewColor(c)}
-                className={`w-6 h-6 rounded-full transition-transform ${newColor === c ? 'ring-2 ring-white ring-offset-1 ring-offset-slate-800 scale-110' : ''}`}
-                style={{ backgroundColor: c }}
-              />
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => setAdding(false)}
-              className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 text-sm transition-colors">
-              Cancel
-            </button>
-            <button onClick={addCategory} disabled={!newName.trim()}
-              className="flex-1 py-2 bg-indigo-500 hover:bg-indigo-400 disabled:opacity-40 rounded-lg text-white text-sm font-semibold transition-colors">
-              Add
-            </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => setAdding(false)} className="btn btn-ghost" style={{ flex: 1, fontSize: '13px', padding: '9px' }}>cancel</button>
+            <button onClick={addCategory} disabled={!newName.trim()} className="btn btn-primary" style={{ flex: 1, fontSize: '13px', padding: '9px' }}>add →</button>
           </div>
         </div>
       ) : (
         <button onClick={() => setAdding(true)}
-          className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-700 hover:border-slate-500 rounded-xl text-slate-500 hover:text-slate-300 text-sm transition-colors">
-          <Plus size={16} /> New category
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+            padding: '11px', background: 'transparent',
+            border: '1px dashed var(--border-2)', borderRadius: 'var(--radius)',
+            color: 'var(--text-4)', fontFamily: 'var(--font-ui)', fontSize: '13px',
+            cursor: 'pointer', transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-3)'; e.currentTarget.style.color = 'var(--text-2)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text-4)'; }}>
+          <Plus size={14} /> new category
         </button>
       )}
     </div>
@@ -127,7 +145,7 @@ function ProfileManager({ profileId, profiles, onSwitchProfile, onProfileCreated
 
   async function handleCreate(e) {
     e.preventDefault()
-    if (!newName.trim()) return
+    if (!newName.trim() || creating) return
     setCreating(true)
     const id = await createProfile(newName.trim())
     onProfileCreated(id)
@@ -148,40 +166,48 @@ function ProfileManager({ profileId, profiles, onSwitchProfile, onProfileCreated
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       {profiles.map(p => (
-        <div key={p.id} className={`flex items-center gap-3 p-3 bg-slate-800 rounded-xl border ${p.id === profileId ? 'border-indigo-500' : 'border-slate-700'}`}>
-          <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-sm font-bold text-indigo-300 shrink-0">
+        <div key={p.id} style={{
+          display: 'flex', alignItems: 'center', gap: '12px',
+          padding: '12px 14px',
+          background: 'var(--bg-3)',
+          border: `1px solid ${p.id === profileId ? 'var(--amber-border)' : 'var(--border)'}`,
+          borderRadius: 'var(--radius)',
+        }}>
+          <div style={{
+            width: '32px', height: '32px', borderRadius: '50%',
+            background: 'var(--amber-bg)', border: '1px solid var(--amber-border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-display)', fontSize: '16px', color: 'var(--amber)', flexShrink: 0,
+          }}>
             {p.name[0].toUpperCase()}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-100">{p.name}</p>
-            {p.id === profileId && <p className="text-xs text-indigo-400">Active</p>}
+          <div style={{ flex: 1 }}>
+            <p style={{ fontFamily: 'var(--font-ui)', fontSize: '14px', color: 'var(--text)', margin: 0 }}>{p.name}</p>
+            {p.id === profileId && <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--amber)', margin: 0, letterSpacing: '0.05em' }}>active</p>}
           </div>
           {p.id !== profileId && (
             <button onClick={() => { onSwitchProfile(p.id); onClose() }}
-              className="text-xs text-indigo-400 hover:text-indigo-300 px-2 py-1 bg-indigo-500/10 rounded-lg transition-colors">
-              Switch
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer', transition: 'all 0.15s ease' }}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--amber)'; e.currentTarget.style.borderColor = 'var(--amber-border)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}>
+              switch →
             </button>
           )}
           {profiles.length > 1 && (
-            <button onClick={() => deleteProfile(p.id)} className="text-slate-600 hover:text-red-400 transition-colors p-1">
+            <button onClick={() => deleteProfile(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-4)', padding: '4px', transition: 'color 0.15s ease' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#C47B7A'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-4)'}>
               <Trash2 size={14} />
             </button>
           )}
         </div>
       ))}
 
-      <form onSubmit={handleCreate} className="flex gap-2 pt-2">
-        <input
-          value={newName}
-          onChange={e => setNewName(e.target.value)}
-          placeholder="New profile name"
-          className="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-slate-100 placeholder-slate-500 text-sm transition-colors"
-        />
-        <button type="submit" disabled={!newName.trim() || creating}
-          className="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 disabled:opacity-40 rounded-xl text-white text-sm font-semibold transition-colors flex items-center gap-1.5">
-          <UserPlus size={14} /> Add
+      <form onSubmit={handleCreate} style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
+        <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="new profile name" className="field accent-focus" style={{ flex: 1, fontSize: '14px' }} />
+        <button type="submit" disabled={!newName.trim() || creating} className="btn btn-primary" style={{ padding: '0 16px', flexShrink: 0 }}>
+          <UserPlus size={14} />
         </button>
       </form>
     </div>
@@ -202,45 +228,41 @@ function ApiKeysManager({ profileId }) {
   if (!settings) return null
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300 leading-relaxed">
-        API keys are stored locally on your device and never sent to any server.
-        Both keys are optional — without them, search enrichment is disabled.
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ padding: '12px 14px', background: 'var(--amber-bg)', border: '1px solid var(--amber-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', lineHeight: 1.6, letterSpacing: '0.02em' }}>
+        keys are stored locally — never sent anywhere.
+        both are optional; without them, search enrichment is disabled.
       </div>
 
       {[
-        {
-          key: 'tmdbApiKey', label: 'TMDB API Key', show: showTmdb, setShow: setShowTmdb,
-          hint: 'Free at themoviedb.org — powers movie & TV search',
-        },
-        {
-          key: 'omdbApiKey', label: 'OMDB API Key', show: showOmdb, setShow: setShowOmdb,
-          hint: 'Free at omdbapi.com — adds IMDb & Rotten Tomatoes scores',
-        },
-      ].map(({ key, label, hint, show, setShow }) => (
+        { key: 'tmdbApiKey', lbl: 'TMDB API key', show: showTmdb, setShow: setShowTmdb, hint: 'free at themoviedb.org — powers movie & TV search' },
+        { key: 'omdbApiKey', lbl: 'OMDB API key', show: showOmdb, setShow: setShowOmdb, hint: 'free at omdbapi.com — adds IMDb & RT scores' },
+      ].map(({ key, lbl, hint, show, setShow }) => (
         <div key={key}>
-          <label className="text-xs text-slate-400 uppercase tracking-wider mb-2 block">{label}</label>
-          <div className="relative">
+          {label(lbl)}
+          <div style={{ position: 'relative' }}>
             <input
               type={show ? 'text' : 'password'}
               value={settings[key] || ''}
               onChange={e => update(key, e.target.value)}
-              placeholder="Paste your API key…"
-              className="w-full px-4 pr-10 py-2.5 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-slate-100 placeholder-slate-500 text-sm transition-colors"
+              placeholder="paste your key…"
+              className="field accent-focus"
+              style={{ paddingRight: '42px' }}
             />
             <button type="button" onClick={() => setShow(s => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
-              {show ? <EyeOff size={16} /> : <Eye size={16} />}
+              style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-4)', display: 'flex', transition: 'color 0.15s ease' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--text-2)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-4)'}>
+              {show ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
           </div>
-          <p className="text-xs text-slate-600 mt-1.5">{hint}</p>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-4)', marginTop: '6px', letterSpacing: '0.03em' }}>{hint}</p>
         </div>
       ))}
     </div>
   )
 }
 
-// ── Data Export/Import ────────────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────────────────
 
 function DataManager({ profileId }) {
   const [importing, setImporting] = useState(false)
@@ -251,9 +273,7 @@ function DataManager({ profileId }) {
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url
-    a.download = `stash-export-${Date.now()}.json`
-    a.click()
+    a.href = url; a.download = `stash-${Date.now()}.json`; a.click()
     URL.revokeObjectURL(url)
   }
 
@@ -263,68 +283,83 @@ function DataManager({ profileId }) {
     setImporting(true)
     const reader = new FileReader()
     reader.onload = async (ev) => {
-      try {
-        await importProfile(ev.target.result)
-        setMsg('Profile imported successfully! Switch to it from the Profiles tab.')
-      } catch (err) {
-        setMsg('Import failed: ' + err.message)
-      } finally {
-        setImporting(false)
-      }
+      try { await importProfile(ev.target.result); setMsg('imported. switch to it from Profiles tab.') }
+      catch (err) { setMsg('import failed: ' + err.message) }
+      finally { setImporting(false) }
     }
     reader.readAsText(file)
   }
 
+  const rowStyle = { display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '20px', borderBottom: '1px solid var(--border)' }
+  const btnStyle = { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--text-2)', fontFamily: 'var(--font-ui)', fontSize: '13px', cursor: 'pointer', transition: 'all 0.15s ease', width: 'fit-content' }
+
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <p className="text-sm font-medium text-slate-200 mb-1">Export your data</p>
-        <p className="text-xs text-slate-500 mb-3">Download all your todos and categories as a JSON file. Use this to back up or transfer to another device.</p>
-        <button onClick={handleExport}
-          className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-200 text-sm font-medium transition-colors">
-          <Download size={16} /> Export profile
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={rowStyle}>
+        {label('export')}
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-4)', marginBottom: '4px', lineHeight: 1.6 }}>download all your data as json</p>
+        <button onClick={handleExport} style={btnStyle}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)'; }}>
+          <Download size={14} /> export profile
         </button>
       </div>
-      <div className="border-t border-slate-800 pt-4">
-        <p className="text-sm font-medium text-slate-200 mb-1">Import a profile</p>
-        <p className="text-xs text-slate-500 mb-3">Import a previously exported Stash JSON file. Creates a new profile.</p>
-        <label className={`flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-200 text-sm font-medium transition-colors cursor-pointer ${importing ? 'opacity-50' : ''}`}>
-          <Upload size={16} /> {importing ? 'Importing…' : 'Import file'}
-          <input type="file" accept=".json" onChange={handleImport} className="hidden" disabled={importing} />
+      <div>
+        {label('import')}
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-4)', marginBottom: '8px', lineHeight: 1.6 }}>import a stash json file — creates a new profile</p>
+        <label style={{ ...btnStyle, cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.5 : 1 }}
+          onMouseEnter={e => { if (!importing) { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)'; }}>
+          <Upload size={14} /> {importing ? 'importing…' : 'import file'}
+          <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} disabled={importing} />
         </label>
-        {msg && <p className={`text-xs mt-2 ${msg.includes('failed') ? 'text-red-400' : 'text-emerald-400'}`}>{msg}</p>}
+        {msg && <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: msg.includes('failed') ? '#C47B7A' : '#5A9E7E', marginTop: '8px' }}>{msg}</p>}
       </div>
     </div>
   )
 }
 
-// ── Main Settings Modal ───────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────
 
 export default function SettingsModal({ profileId, profiles, onClose, onSwitchProfile, onProfileCreated }) {
   const [activeTab, setActiveTab] = useState('Categories')
 
   return (
-    <Modal title="Settings" onClose={onClose} fullscreen>
-      <div className="flex border-b border-slate-800 px-1 overflow-x-auto no-scrollbar shrink-0 sticky top-0 bg-slate-900 z-10">
+    <Modal title="settings" onClose={onClose} fullscreen>
+      {/* Tabs */}
+      <div className="no-scrollbar" style={{
+        display: 'flex', overflowX: 'auto',
+        borderBottom: '1px solid var(--border)',
+        position: 'sticky', top: 0, background: 'var(--bg-2)', zIndex: 10,
+        padding: '0 16px',
+        flexShrink: 0,
+      }}>
         {TABS.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px
-              ${activeTab === tab ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+            style={{
+              padding: '12px 14px', background: 'none', border: 'none',
+              borderBottom: `2px solid ${activeTab === tab ? 'var(--amber)' : 'transparent'}`,
+              marginBottom: '-1px',
+              color: activeTab === tab ? 'var(--text)' : 'var(--text-4)',
+              fontFamily: 'var(--font-ui)', fontSize: '13px',
+              fontWeight: activeTab === tab ? 600 : 400,
+              cursor: 'pointer', whiteSpace: 'nowrap',
+              transition: 'color 0.15s ease',
+              letterSpacing: '0.02em',
+            }}
+            onMouseEnter={e => { if (activeTab !== tab) e.currentTarget.style.color = 'var(--text-2)'; }}
+            onMouseLeave={e => { if (activeTab !== tab) e.currentTarget.style.color = 'var(--text-4)'; }}
           >
             {tab}
           </button>
         ))}
       </div>
-      <div className="p-5">
+
+      <div style={{ padding: '20px' }}>
         {activeTab === 'Categories' && <CategoryManager profileId={profileId} />}
-        {activeTab === 'Profiles' && (
-          <ProfileManager
-            profileId={profileId} profiles={profiles}
-            onSwitchProfile={onSwitchProfile} onProfileCreated={onProfileCreated} onClose={onClose}
-          />
-        )}
+        {activeTab === 'Profiles' && <ProfileManager profileId={profileId} profiles={profiles} onSwitchProfile={onSwitchProfile} onProfileCreated={onProfileCreated} onClose={onClose} />}
         {activeTab === 'API Keys' && <ApiKeysManager profileId={profileId} />}
         {activeTab === 'Data' && <DataManager profileId={profileId} />}
       </div>

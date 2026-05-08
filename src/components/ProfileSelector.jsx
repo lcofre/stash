@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Package, Plus } from 'lucide-react'
 import { createProfile } from '../db/index.js'
 
 export default function ProfileSelector({ profiles, onSelect }) {
@@ -8,64 +7,129 @@ export default function ProfileSelector({ profiles, onSelect }) {
 
   async function handleCreate(e) {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!name.trim() || creating) return
     setCreating(true)
     const id = await createProfile(name.trim())
     onSelect(id)
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-6">
-      <div className="mb-8 flex flex-col items-center gap-3">
-        <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center">
-          <Package size={32} className="text-indigo-400" />
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--bg)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '32px 24px',
+    }}>
+      {/* Ambient glow */}
+      <div style={{
+        position: 'fixed', top: '30%', left: '50%', transform: 'translate(-50%,-50%)',
+        width: '300px', height: '200px',
+        background: 'radial-gradient(ellipse, rgba(201,145,62,0.06) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+
+      <div className="anim-fade-up" style={{ width: '100%', maxWidth: '340px', position: 'relative' }}>
+        {/* Wordmark */}
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <h1 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '48px',
+            fontWeight: 500,
+            letterSpacing: '0.22em',
+            color: 'var(--text)',
+            margin: 0,
+            lineHeight: 1,
+          }}>
+            STASH
+          </h1>
+          <p style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '11px',
+            color: 'var(--text-4)',
+            letterSpacing: '0.14em',
+            marginTop: '10px',
+            textTransform: 'uppercase',
+          }}>
+            your personal archive
+          </p>
+          <div style={{ width: '32px', height: '1px', background: 'var(--amber)', opacity: 0.5, margin: '18px auto 0' }} />
         </div>
-        <h1 className="text-3xl font-bold text-slate-100 tracking-tight">Stash</h1>
-        <p className="text-slate-400 text-sm text-center">Your personal categorized todo list</p>
+
+        {/* Existing profiles */}
+        {profiles.length > 0 && (
+          <div style={{ marginBottom: '28px' }}>
+            <p style={{
+              fontFamily: 'var(--font-mono)', fontSize: '10px',
+              color: 'var(--text-4)', letterSpacing: '0.1em',
+              textTransform: 'uppercase', marginBottom: '10px',
+            }}>
+              continue as
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {profiles.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => onSelect(p.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    width: '100%', padding: '12px 16px',
+                    background: 'var(--bg-2)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-lg)',
+                    cursor: 'pointer',
+                    transition: 'border-color 0.15s ease, background 0.15s ease',
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-3)'; e.currentTarget.style.background = 'var(--bg-3)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg-2)'; }}
+                >
+                  <span style={{ fontFamily: 'var(--font-ui)', fontSize: '15px', fontWeight: 500, color: 'var(--text)' }}>
+                    {p.name}
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--amber)', opacity: 0.7 }}>→</span>
+                </button>
+              ))}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '24px 0 20px' }}>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.08em' }}>or</span>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
+            </div>
+          </div>
+        )}
+
+        {/* Create form */}
+        <div>
+          <p style={{
+            fontFamily: 'var(--font-mono)', fontSize: '10px',
+            color: 'var(--text-4)', letterSpacing: '0.1em',
+            textTransform: 'uppercase', marginBottom: '10px',
+          }}>
+            {profiles.length === 0 ? 'begin' : 'new profile'}
+          </p>
+          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="your name or nickname"
+              className="field accent-focus"
+              style={{ fontSize: '15px', padding: '13px 16px' }}
+              autoFocus
+            />
+            <button
+              type="submit"
+              disabled={!name.trim() || creating}
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '13px', fontSize: '14px', letterSpacing: '0.04em' }}
+            >
+              {profiles.length === 0 ? 'begin your archive →' : 'create profile →'}
+            </button>
+          </form>
+        </div>
       </div>
-
-      {profiles.length > 0 && (
-        <div className="w-full max-w-sm mb-6">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-3">Your profiles</p>
-          <div className="flex flex-col gap-2">
-            {profiles.map(p => (
-              <button
-                key={p.id}
-                onClick={() => onSelect(p.id)}
-                className="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-100 font-medium transition-colors"
-              >
-                {p.name}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-3 my-5">
-            <div className="h-px flex-1 bg-slate-700" />
-            <span className="text-xs text-slate-500">or</span>
-            <div className="h-px flex-1 bg-slate-700" />
-          </div>
-        </div>
-      )}
-
-      <form onSubmit={handleCreate} className="w-full max-w-sm flex flex-col gap-3">
-        <p className="text-xs text-slate-400 uppercase tracking-wider">
-          {profiles.length === 0 ? 'Create your first profile' : 'New profile'}
-        </p>
-        <input
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder="Your name or nickname"
-          className="w-full px-4 py-3 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-slate-100 placeholder-slate-500 transition-colors"
-          autoFocus
-        />
-        <button
-          type="submit"
-          disabled={!name.trim() || creating}
-          className="w-full py-3 bg-indigo-500 hover:bg-indigo-400 disabled:opacity-40 rounded-xl text-white font-semibold transition-colors flex items-center justify-center gap-2"
-        >
-          <Plus size={18} />
-          Create profile
-        </button>
-      </form>
     </div>
   )
 }

@@ -1,10 +1,15 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Plus, Link } from 'lucide-react'
+import { Link } from 'lucide-react'
 import Modal from './ui/Modal.jsx'
 import WatchEnricher from './enrichers/WatchEnricher.jsx'
 import ReadEnricher from './enrichers/ReadEnricher.jsx'
 import { db } from '../db/index.js'
+
+const labelStyle = {
+  fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-4)',
+  letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '8px',
+}
 
 export default function AddTodoModal({ profileId, categoryId, onClose }) {
   const [title, setTitle] = useState('')
@@ -21,6 +26,7 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
   )
 
   const activeCategory = categories?.find(c => c.id === selectedCategoryId) || categories?.[0]
+  const type = activeCategory?.type || 'todo'
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -42,77 +48,90 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
     onClose()
   }
 
-  const type = activeCategory?.type || 'todo'
-
   return (
-    <Modal title="Add to Stash" onClose={onClose}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
-        {/* Category selector */}
+    <Modal title="add to stash" onClose={onClose}>
+      <form onSubmit={handleSubmit} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+        {/* Category chips */}
         {categories && categories.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => { setSelectedCategoryId(cat.id); setMetadata(null) }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0
-                  ${cat.id === activeCategory?.id ? 'text-white' : 'text-slate-400 bg-slate-800 hover:bg-slate-700'}`}
-                style={cat.id === activeCategory?.id ? { backgroundColor: cat.color } : {}}
-              >
-                {cat.icon} {cat.name}
-              </button>
-            ))}
+          <div>
+            <span style={labelStyle}>category</span>
+            <div className="no-scrollbar" style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
+              {categories.map(cat => {
+                const active = cat.id === activeCategory?.id
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => { setSelectedCategoryId(cat.id); setMetadata(null) }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '5px',
+                      padding: '6px 12px',
+                      borderRadius: '20px',
+                      border: `1px solid ${active ? cat.color : 'var(--border)'}`,
+                      background: active ? `${cat.color}18` : 'transparent',
+                      color: active ? 'var(--text)' : 'var(--text-3)',
+                      fontFamily: 'var(--font-ui)', fontSize: '13px', fontWeight: active ? 600 : 400,
+                      cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <span style={{ fontSize: '11px' }}>{cat.icon}</span>
+                    {cat.name}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         )}
 
-        {/* Enricher */}
+        {/* Enricher section */}
         {type === 'watch' && (
           <div>
-            <label className="text-xs text-slate-400 uppercase tracking-wider mb-2 block">Movie / TV Show</label>
+            <span style={labelStyle}>find it</span>
             <WatchEnricher profileId={profileId} value={metadata} onChange={setMetadata} />
           </div>
         )}
         {type === 'read' && (
           <div>
-            <label className="text-xs text-slate-400 uppercase tracking-wider mb-2 block">Book</label>
+            <span style={labelStyle}>find it</span>
             <ReadEnricher value={metadata} onChange={setMetadata} />
           </div>
         )}
 
         {/* Title */}
         <div>
-          <label className="text-xs text-slate-400 uppercase tracking-wider mb-2 block">
-            {type === 'watch' || type === 'read' ? 'Or enter title manually' : 'Title'}
-            {(type === 'watch' || type === 'read') ? '' : ' *'}
-          </label>
+          <span style={labelStyle}>
+            {type === 'watch' || type === 'read' ? 'or type manually' : 'title'}
+          </span>
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder={
-              type === 'watch' ? 'Movie or show title…' :
-              type === 'read' ? 'Book title or URL…' :
-              type === 'research' ? 'Topic to research…' :
-              type === 'buy' ? 'Item to buy…' :
-              'What needs to be done?'
+              type === 'watch' ? 'title of movie or show…' :
+              type === 'read' ? 'book title or link…' :
+              type === 'research' ? 'what to research…' :
+              type === 'buy' ? 'what to buy…' : 'what needs doing…'
             }
-            className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-slate-100 placeholder-slate-500 text-sm transition-colors"
+            className="field accent-focus"
             required={!metadata}
-            autoFocus={!metadata}
+            autoFocus={type !== 'watch' && type !== 'read'}
           />
         </div>
 
-        {/* URL field for research/read */}
+        {/* URL for research/read */}
         {(type === 'research' || type === 'read') && (
           <div>
-            <label className="text-xs text-slate-400 uppercase tracking-wider mb-2 block">URL (optional)</label>
-            <div className="relative">
-              <Link size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <span style={labelStyle}>url</span>
+            <div style={{ position: 'relative' }}>
+              <Link size={13} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-4)' }} />
               <input
                 type="url"
                 value={url}
                 onChange={e => setUrl(e.target.value)}
                 placeholder="https://…"
-                className="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-slate-100 placeholder-slate-500 text-sm transition-colors"
+                className="field accent-focus"
+                style={{ paddingLeft: '34px' }}
               />
             </div>
           </div>
@@ -120,42 +139,40 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
 
         {/* Date */}
         <div>
-          <label className="text-xs text-slate-400 uppercase tracking-wider mb-2 block">Date (optional)</label>
+          <span style={labelStyle}>date <span style={{ color: 'var(--text-4)', textTransform: 'none', letterSpacing: 0 }}>— optional</span></span>
           <input
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-slate-100 placeholder-slate-500 text-sm transition-colors"
+            className="field accent-focus"
           />
         </div>
 
         {/* Notes */}
         <div>
-          <label className="text-xs text-slate-400 uppercase tracking-wider mb-2 block">Notes (optional)</label>
+          <span style={labelStyle}>notes <span style={{ color: 'var(--text-4)', textTransform: 'none', letterSpacing: 0 }}>— optional</span></span>
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
-            placeholder="Add notes…"
+            placeholder="any thoughts…"
             rows={3}
-            className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-slate-100 placeholder-slate-500 text-sm transition-colors resize-none"
+            className="field accent-focus"
+            style={{ resize: 'none', lineHeight: 1.55 }}
           />
         </div>
 
-        <div className="flex gap-3 pt-1">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 font-medium transition-colors"
-          >
-            Cancel
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: '10px', paddingBottom: '8px' }}>
+          <button type="button" onClick={onClose} className="btn btn-ghost" style={{ flex: 1 }}>
+            cancel
           </button>
           <button
             type="submit"
             disabled={saving || (!title.trim() && !metadata)}
-            className="flex-1 py-3 bg-indigo-500 hover:bg-indigo-400 disabled:opacity-40 rounded-xl text-white font-semibold transition-colors flex items-center justify-center gap-2"
+            className="btn btn-primary"
+            style={{ flex: 2 }}
           >
-            <Plus size={18} />
-            Add to Stash
+            stash it →
           </button>
         </div>
       </form>

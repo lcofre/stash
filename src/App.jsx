@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Settings, Plus, Package } from 'lucide-react'
+import { SlidersHorizontal, Plus } from 'lucide-react'
 import { db } from './db/index.js'
 import ProfileSelector from './components/ProfileSelector.jsx'
 import CategoryTabs from './components/CategoryTabs.jsx'
@@ -10,19 +10,35 @@ import SettingsModal from './components/SettingsModal.jsx'
 
 function Header({ profile, onSettings }) {
   return (
-    <header className="flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 shrink-0">
-      <div className="flex items-center gap-2">
-        <Package size={20} className="text-indigo-400" />
-        <span className="font-bold text-slate-100 text-lg tracking-tight">Stash</span>
-        <span className="text-slate-500 text-sm">· {profile.name}</span>
+    <header style={{ background: 'var(--bg-2)', borderBottom: '1px solid var(--border)' }}
+      className="flex items-center justify-between px-5 py-3.5 shrink-0">
+      <div className="flex items-baseline gap-3">
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--text)', lineHeight: 1 }}>
+          STASH
+        </span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', letterSpacing: '0.04em' }}>
+          {profile.name}
+        </span>
       </div>
       <button
         onClick={onSettings}
-        className="p-2 text-slate-400 hover:text-slate-200 transition-colors rounded-lg hover:bg-slate-800"
+        style={{ color: 'var(--text-3)', padding: '6px', borderRadius: '8px', background: 'transparent', border: 'none', transition: 'color 0.15s ease', cursor: 'pointer' }}
+        onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
+        aria-label="Settings"
       >
-        <Settings size={20} />
+        <SlidersHorizontal size={18} />
       </button>
     </header>
+  )
+}
+
+function LoadingScreen() {
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '28px', height: '28px', border: '1.5px solid var(--amber)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
   )
 }
 
@@ -40,28 +56,15 @@ export default function App() {
     if (activeProfileId) localStorage.setItem('stash_profile', String(activeProfileId))
   }, [activeProfileId])
 
-  // still loading
-  if (profiles === undefined) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (profiles === undefined) return <LoadingScreen />
 
-  // no profiles yet, or active profile deleted
   const activeProfile = profiles.find(p => p.id === activeProfileId)
   if (profiles.length === 0 || !activeProfile) {
-    return (
-      <ProfileSelector
-        profiles={profiles}
-        onSelect={(id) => setActiveProfileId(id)}
-      />
-    )
+    return <ProfileSelector profiles={profiles} onSelect={setActiveProfileId} />
   }
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)' }}>
       <Header profile={activeProfile} onSettings={() => setShowSettings(true)} />
 
       <CategoryTabs
@@ -73,15 +76,32 @@ export default function App() {
       <TodoList
         profileId={activeProfileId}
         categoryId={activeCategoryId}
+        onAdd={() => setShowAddModal(true)}
       />
 
-      {/* Floating action button */}
+      {/* FAB */}
       <button
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-indigo-500 hover:bg-indigo-400 active:scale-95 rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center transition-all z-40"
         aria-label="Add item"
+        style={{
+          position: 'fixed', bottom: '24px', right: '22px',
+          width: '52px', height: '52px',
+          background: 'var(--amber)',
+          borderRadius: '50%',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#0c0b0f',
+          boxShadow: '0 4px 24px rgba(201,145,62,0.35)',
+          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+          zIndex: 40,
+        }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.06)'; e.currentTarget.style.boxShadow = '0 6px 30px rgba(201,145,62,0.45)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(201,145,62,0.35)'; }}
+        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+        onMouseUp={e => e.currentTarget.style.transform = 'scale(1.06)'}
       >
-        <Plus size={24} className="text-white" />
+        <Plus size={22} strokeWidth={2.5} />
       </button>
 
       {showAddModal && (
@@ -91,7 +111,6 @@ export default function App() {
           onClose={() => setShowAddModal(false)}
         />
       )}
-
       {showSettings && (
         <SettingsModal
           profileId={activeProfileId}
