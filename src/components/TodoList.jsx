@@ -4,19 +4,28 @@ import TodoCard from './TodoCard.jsx'
 import { db } from '../db/index.js'
 
 function EmptyState({ icon, message, sub, onAdd }) {
+  const defaultIcon = icon ? (
+    <span style={{ fontSize: '56px', lineHeight: 1 }}>{icon}</span>
+  ) : (
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.25 }}>
+      <rect x="14" y="14" width="28" height="28" rx="2" stroke="currentColor" strokeWidth="2"/>
+      <path d="M20 28L24 32L36 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.4"/>
+    </svg>
+  );
+
   return (
     <div style={{
       flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
       justifyContent: 'center', padding: '60px 32px', textAlign: 'center',
     }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '64px', opacity: 0.12, lineHeight: 1, marginBottom: '24px', userSelect: 'none' }}>
-        {icon || '◻'}
+      <div style={{ fontSize: '56px', opacity: 0.25, lineHeight: 1, marginBottom: '28px', userSelect: 'none', color: 'var(--text)' }}>
+        {defaultIcon}
       </div>
-      <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: '20px', color: 'var(--text-3)', marginBottom: '8px', fontWeight: 400 }}>
+      <p style={{ fontSize: '18px', fontWeight: 500, color: 'var(--text-2)', marginBottom: '10px' }}>
         {message}
       </p>
       {sub && (
-        <p style={{ fontFamily: 'var(--font-ui)', fontSize: '13px', color: 'var(--text-4)', letterSpacing: '0.02em' }}>
+        <p style={{ fontSize: 'var(--sz-mono-xs)', color: 'var(--text-3)', letterSpacing: '0.01em', lineHeight: 1.5 }}>
           {sub}
         </p>
       )}
@@ -24,9 +33,9 @@ function EmptyState({ icon, message, sub, onAdd }) {
         <button
           onClick={onAdd}
           className="btn btn-ghost"
-          style={{ marginTop: '24px', fontSize: '13px' }}
+          style={{ marginTop: '28px', fontSize: 'var(--sz-mono-xs)', fontWeight: 500 }}
         >
-          add the first one
+          + add the first one
         </button>
       )}
     </div>

@@ -58,7 +58,7 @@ export default function WatchEnricher({ profileId, value, onChange }) {
           />
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 500, color: 'var(--text)', lineHeight: 1.2 }}>
+          <p style={{ fontFamily: 'var(--font-ui)', fontSize: '16px', fontWeight: 500, color: 'var(--text)', lineHeight: 1.2 }}>
             {value.title}
           </p>
           <p style={{ ...monoSm, marginTop: '4px' }}>

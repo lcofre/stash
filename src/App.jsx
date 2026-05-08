@@ -10,25 +10,24 @@ import SettingsModal from './components/SettingsModal.jsx'
 
 function Header({ profile, onSettings }) {
   return (
-    <header style={{ background: 'var(--bg-2)', borderBottom: '1px solid var(--border)' }}
-      className="flex items-center justify-between px-5 py-3.5 shrink-0">
-      <div className="flex items-baseline gap-2.5">
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--text)', lineHeight: 1 }}>
-          STASH
+    <header style={{ background: 'var(--bg-2)', borderBottom: '1px solid var(--border-2)' }}
+      className="flex items-center justify-between px-4 py-4 shrink-0">
+      <div className="flex items-center gap-3">
+        <span style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text)' }}>
+          stash
         </span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--amber)', opacity: 0.45, letterSpacing: '0.02em' }}>·</span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--amber)', opacity: 0.55, letterSpacing: '0.04em' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-3)', letterSpacing: '0.03em' }}>
           {profile.name}
         </span>
       </div>
       <button
         onClick={onSettings}
-        style={{ color: 'var(--text-3)', padding: '6px', borderRadius: '8px', background: 'transparent', border: 'none', transition: 'color 0.15s ease', cursor: 'pointer' }}
+        style={{ color: 'var(--text-3)', padding: '8px', borderRadius: '8px', background: 'transparent', border: 'none', transition: 'color 0.15s ease, background 0.15s ease', cursor: 'pointer' }}
         onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
         aria-label="Settings"
       >
-        <SlidersHorizontal size={18} />
+        <SlidersHorizontal size={18} strokeWidth={1.8} />
       </button>
     </header>
   )
@@ -86,30 +85,29 @@ export default function App() {
         aria-label="Add item"
         style={{
           position: 'fixed', bottom: '24px', right: '22px',
-          width: '52px', height: '52px',
+          width: '56px', height: '56px',
           background: 'var(--amber)',
           borderRadius: '50%',
           border: 'none',
           cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#0c0b0f',
-          boxShadow: '0 2px 12px rgba(201,145,62,0.35)',
-          transition: 'background 0.15s ease, box-shadow 0.15s ease',
+          boxShadow: '0 4px 16px rgba(212,168,86,0.25)',
+          transition: 'background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
           zIndex: 40,
-          animation: 'fab-breathe 3s ease-in-out infinite',
         }}
         onMouseEnter={e => {
           e.currentTarget.style.background = 'var(--amber-2)'
-          e.currentTarget.style.boxShadow = '0 4px 20px rgba(201,145,62,0.55)'
-          e.currentTarget.style.animation = 'none'
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(212,168,86,0.35)'
+          e.currentTarget.style.transform = 'scale(1.05)'
         }}
         onMouseLeave={e => {
           e.currentTarget.style.background = 'var(--amber)'
-          e.currentTarget.style.boxShadow = '0 2px 12px rgba(201,145,62,0.35)'
-          e.currentTarget.style.animation = 'fab-breathe 3s ease-in-out infinite'
+          e.currentTarget.style.boxShadow = '0 4px 16px rgba(212,168,86,0.25)'
+          e.currentTarget.style.transform = 'scale(1)'
         }}
       >
-        <Plus size={22} strokeWidth={2.5} />
+        <Plus size={24} strokeWidth={2.2} />
       </button>
 
       {showAddModal && (

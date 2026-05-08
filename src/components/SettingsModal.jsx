@@ -179,7 +179,7 @@ function ProfileManager({ profileId, profiles, onSwitchProfile, onProfileCreated
             width: '32px', height: '32px', borderRadius: '50%',
             background: 'var(--amber-bg)', border: '1px solid var(--amber-border)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'var(--font-display)', fontSize: '16px', color: 'var(--amber)', flexShrink: 0,
+            fontFamily: 'var(--font-ui)', fontSize: '16px', color: 'var(--amber)', flexShrink: 0,
           }}>
             {p.name[0].toUpperCase()}
           </div>

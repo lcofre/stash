@@ -30,7 +30,7 @@ export default function ReadEnricher({ value, onChange }) {
           : <div style={{ width: '40px', height: '60px', background: 'var(--bg-5)', borderRadius: '4px', flexShrink: 0 }} />
         }
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: '16px', fontWeight: 500, color: 'var(--text)', lineHeight: 1.2 }}>
+          <p style={{ fontFamily: 'var(--font-ui)', fontStyle: 'italic', fontSize: '16px', fontWeight: 500, color: 'var(--text)', lineHeight: 1.2 }}>
             {value.title}
           </p>
           <p style={{ ...monoSm, marginTop: '4px' }}>
@@ -80,7 +80,7 @@ export default function ReadEnricher({ value, onChange }) {
                 : <div style={{ width: '32px', height: '48px', background: 'var(--bg-5)', borderRadius: '3px', flexShrink: 0 }} />
               }
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: '14px', fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontFamily: 'var(--font-ui)', fontStyle: 'italic', fontSize: '14px', fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item.title}
                 </p>
                 <p style={{ ...monoSm, marginTop: '3px' }}>

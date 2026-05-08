@@ -44,28 +44,28 @@ function Ratings({ metadata }) {
 function WatchCard({ todo, catColor }) {
   const m = todo.metadata
   return (
-    <div style={{ display: 'flex', gap: '12px' }}>
+    <div style={{ display: 'flex', gap: '14px' }}>
       {m?.posterPath && (
-        <div style={{ flexShrink: 0, width: '44px', height: '65px', borderRadius: '5px', overflow: 'hidden', border: '1px solid var(--border-2)' }}>
+        <div style={{ flexShrink: 0, width: '48px', height: '72px', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--border-2)' }}>
           <img src={`${TMDB_IMG}${m.posterPath}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         </div>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
-          fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 500,
+          fontFamily: 'var(--font-ui)', fontSize: '16px', fontWeight: 600,
           color: todo.done ? 'var(--text-3)' : 'var(--text)',
-          lineHeight: 1.2, letterSpacing: '0.01em',
+          lineHeight: 1.25, letterSpacing: '0.01em',
           textDecoration: todo.done ? 'line-through' : 'none',
         }}>
           {todo.title}
           {m?.year && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)', marginLeft: '8px', fontWeight: 400, fontStyle: 'normal' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)', marginLeft: '8px', fontWeight: 500, fontStyle: 'normal' }}>
               {m.year}
             </span>
           )}
         </p>
         {m && (
-          <p style={{ fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)', marginTop: '3px', letterSpacing: '0.02em' }}>
+          <p style={{ fontFamily: 'var(--font-ui)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-3)', marginTop: '6px', letterSpacing: '0.02em' }}>
             {m.mediaType === 'tv' ? 'series' : 'film'}
             {m.genres?.length ? ' · ' + m.genres.join(', ') : ''}
           </p>
@@ -79,27 +79,26 @@ function WatchCard({ todo, catColor }) {
 function ReadCard({ todo }) {
   const m = todo.metadata
   return (
-    <div style={{ display: 'flex', gap: '12px' }}>
+    <div style={{ display: 'flex', gap: '14px' }}>
       {m?.coverUrl && (
-        <div style={{ flexShrink: 0, width: '44px', height: '65px', borderRadius: '5px', overflow: 'hidden', border: '1px solid var(--border-2)' }}>
+        <div style={{ flexShrink: 0, width: '48px', height: '72px', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--border-2)' }}>
           <img src={m.coverUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         </div>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
-          fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 500,
-          fontStyle: 'italic',
+          fontFamily: 'var(--font-ui)', fontSize: '16px', fontWeight: 600,
           color: todo.done ? 'var(--text-3)' : 'var(--text)',
-          lineHeight: 1.2,
+          lineHeight: 1.25,
           textDecoration: todo.done ? 'line-through' : 'none',
         }}>
           {todo.title}
         </p>
         {m?.authors && (
-          <p style={{ fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)', marginTop: '3px' }}>
+          <p style={{ fontFamily: 'var(--font-ui)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-3)', marginTop: '6px' }}>
             {m.authors}
-            {m.publishedYear && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '6px', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)' }}>{m.publishedYear}</span>}
-            {m.pageCount && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '6px', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)' }}>{m.pageCount}p</span>}
+            {m.publishedYear && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '8px', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)' }}>{m.publishedYear}</span>}
+            {m.pageCount && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '8px', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)' }}>{m.pageCount}p</span>}
           </p>
         )}
       </div>
@@ -110,9 +109,9 @@ function ReadCard({ todo }) {
 function SimpleCard({ todo }) {
   return (
     <p style={{
-      fontFamily: 'var(--font-ui)', fontSize: '15px', fontWeight: 500,
+      fontFamily: 'var(--font-ui)', fontSize: '16px', fontWeight: 500,
       color: todo.done ? 'var(--text-3)' : 'var(--text)',
-      lineHeight: 1.35,
+      lineHeight: 1.4,
       textDecoration: todo.done ? 'line-through' : 'none',
     }}>
       {todo.title}
@@ -189,7 +188,7 @@ export default function TodoCard({ todo, category }) {
           {expanded && !todo.done && (
             <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border)' }}>
               {(todo.metadata?.overview || todo.metadata?.description) && (
-                <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: '14px', color: 'var(--text-3)', lineHeight: 1.6, marginBottom: todo.notes ? '10px' : 0 }}>
+                <p style={{ fontFamily: 'var(--font-ui)', fontStyle: 'italic', fontSize: '14px', color: 'var(--text-3)', lineHeight: 1.6, marginBottom: todo.notes ? '10px' : 0 }}>
                   {(todo.metadata.overview || todo.metadata.description).slice(0, 280)}
                   {(todo.metadata.overview || todo.metadata.description).length > 280 ? '…' : ''}
                 </p>
