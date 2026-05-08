@@ -7,7 +7,7 @@ import { db, createProfile, CATEGORY_COLORS, CATEGORY_ICONS, exportProfile, impo
 const TABS = ['Categories', 'Profiles', 'API Keys', 'Data']
 
 const label = (text) => (
-  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+  <span style={{ fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)', display: 'block', marginBottom: '8px' }}>
     {text}
   </span>
 )

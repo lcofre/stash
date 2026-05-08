@@ -10,9 +10,9 @@
   --bg-5:     #252333;
 
   --text:     #EDE8DF;
-  --text-2:   rgba(237, 232, 223, 0.52);
-  --text-3:   rgba(237, 232, 223, 0.25);
-  --text-4:   rgba(237, 232, 223, 0.12);
+  --text-2:   rgba(237, 232, 223, 0.72);
+  --text-3:   rgba(237, 232, 223, 0.50);
+  --text-4:   rgba(237, 232, 223, 0.28);
 
   --amber:    #C9913E;
   --amber-2:  #E0A84C;
@@ -20,12 +20,16 @@
   --amber-border: rgba(201, 145, 62, 0.25);
 
   --border:   rgba(237, 232, 223, 0.07);
-  --border-2: rgba(237, 232, 223, 0.12);
-  --border-3: rgba(237, 232, 223, 0.18);
+  --border-2: rgba(237, 232, 223, 0.13);
+  --border-3: rgba(237, 232, 223, 0.20);
 
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-ui:      'Syne', system-ui, sans-serif;
   --font-mono:    'DM Mono', 'Courier New', monospace;
+
+  /* Smallest readable mono text — scales up on mobile */
+  --sz-mono-xs: 11px;
+  --sz-mono-sm: 13px;
 
   --radius:   10px;
   --radius-lg: 14px;
@@ -46,6 +50,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
+}
+
+/* ── Mobile typography ─────────────────────────────────────── */
+@media (max-width: 430px) {
+  :root {
+    --sz-mono-xs: 12.5px;
+    --sz-mono-sm: 14px;
+  }
+  body { font-size: 16px; }
+  /* Prevent iOS auto-zoom on input focus */
+  input, textarea, select { font-size: max(16px, 1em) !important; }
 }
 
 /* ── Grain texture overlay ─────────────────────────────────── */
@@ -86,22 +101,17 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.35; filter: i
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-@keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(-8px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
 @keyframes sheet-up {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes check-in {
-  0%   { transform: scale(0) rotate(-12deg); opacity: 0; }
-  60%  { transform: scale(1.25) rotate(4deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); opacity: 1; }
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
-@keyframes amber-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 145, 62, 0); }
-  50%       { box-shadow: 0 0 0 6px rgba(201, 145, 62, 0.18); }
+@keyframes fab-breathe {
+  0%, 100% { box-shadow: 0 2px 12px rgba(201,145,62,0.35); }
+  50%       { box-shadow: 0 2px 22px rgba(201,145,62,0.55); }
 }
 
 .anim-fade-up  { animation: fade-up 0.35s cubic-bezier(0.16,1,0.3,1) both; }

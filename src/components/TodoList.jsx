@@ -75,9 +75,9 @@ function CalendarView({ profileId }) {
         {Object.entries(groups).map(([label, items]) => (
           <div key={label}>
             <p style={{
-              fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.06em',
+              fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)',
               color: label === 'overdue' ? overdueColor : label === 'today' ? todayColor : 'var(--text-3)',
-              textTransform: 'uppercase', marginBottom: '10px', paddingLeft: '2px',
+              marginBottom: '10px', paddingLeft: '2px',
             }}>
               {label}
             </p>
@@ -165,7 +165,7 @@ export default function TodoList({ profileId, categoryId, onAdd }) {
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0 4px' }}>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)' }}>
                 done · {done.length}
               </span>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />

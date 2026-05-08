@@ -34,10 +34,10 @@ export default function Modal({ title, onClose, children, fullscreen = false }) 
           position: 'relative', zIndex: 10,
           background: 'var(--bg-2)',
           border: '1px solid var(--border-2)',
-          boxShadow: '0 -8px 60px rgba(0,0,0,0.5)',
+          boxShadow: '0 -2px 16px rgba(0,0,0,0.25)',
           width: '100%',
           maxWidth: fullscreen ? '100%' : '520px',
-          borderRadius: fullscreen ? 0 : '16px 16px 0 0',
+          borderRadius: fullscreen ? 0 : '12px 12px 0 0',
           maxHeight: fullscreen ? '100%' : '90vh',
           display: 'flex',
           flexDirection: 'column',
@@ -51,7 +51,7 @@ export default function Modal({ title, onClose, children, fullscreen = false }) 
             borderBottom: '1px solid var(--border)',
             flexShrink: 0,
           }}>
-            <h2 style={{ fontFamily: 'var(--font-ui)', fontSize: '14px', fontWeight: 600, color: 'var(--text-2)', margin: 0, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <h2 style={{ fontFamily: 'var(--font-ui)', fontSize: '14px', fontWeight: 600, color: 'var(--text-2)', margin: 0 }}>
               {title}
             </h2>
             <button

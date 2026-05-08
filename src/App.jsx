@@ -12,11 +12,12 @@ function Header({ profile, onSettings }) {
   return (
     <header style={{ background: 'var(--bg-2)', borderBottom: '1px solid var(--border)' }}
       className="flex items-center justify-between px-5 py-3.5 shrink-0">
-      <div className="flex items-baseline gap-3">
+      <div className="flex items-baseline gap-2.5">
         <span style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--text)', lineHeight: 1 }}>
           STASH
         </span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', letterSpacing: '0.04em' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--amber)', opacity: 0.45, letterSpacing: '0.02em' }}>·</span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--amber)', opacity: 0.55, letterSpacing: '0.04em' }}>
           {profile.name}
         </span>
       </div>
@@ -92,14 +93,21 @@ export default function App() {
           cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#0c0b0f',
-          boxShadow: '0 4px 24px rgba(201,145,62,0.35)',
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+          boxShadow: '0 2px 12px rgba(201,145,62,0.35)',
+          transition: 'background 0.15s ease, box-shadow 0.15s ease',
           zIndex: 40,
+          animation: 'fab-breathe 3s ease-in-out infinite',
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.06)'; e.currentTarget.style.boxShadow = '0 6px 30px rgba(201,145,62,0.45)'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(201,145,62,0.35)'; }}
-        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
-        onMouseUp={e => e.currentTarget.style.transform = 'scale(1.06)'}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = 'var(--amber-2)'
+          e.currentTarget.style.boxShadow = '0 4px 20px rgba(201,145,62,0.55)'
+          e.currentTarget.style.animation = 'none'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = 'var(--amber)'
+          e.currentTarget.style.boxShadow = '0 2px 12px rgba(201,145,62,0.35)'
+          e.currentTarget.style.animation = 'fab-breathe 3s ease-in-out infinite'
+        }}
       >
         <Plus size={22} strokeWidth={2.5} />
       </button>

@@ -7,8 +7,8 @@ import ReadEnricher from './enrichers/ReadEnricher.jsx'
 import { db } from '../db/index.js'
 
 const labelStyle = {
-  fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-4)',
-  letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '8px',
+  fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)',
+  display: 'block', marginBottom: '8px',
 }
 
 export default function AddTodoModal({ profileId, categoryId, onClose }) {
@@ -67,7 +67,7 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
                     style={{
                       display: 'flex', alignItems: 'center', gap: '5px',
                       padding: '6px 12px',
-                      borderRadius: '20px',
+                      borderRadius: '8px',
                       border: `1px solid ${active ? cat.color : 'var(--border)'}`,
                       background: active ? `${cat.color}18` : 'transparent',
                       color: active ? 'var(--text)' : 'var(--text-3)',

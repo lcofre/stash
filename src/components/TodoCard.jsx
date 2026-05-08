@@ -16,7 +16,7 @@ function DateLabel({ date }) {
   const color = today ? '#7B9ED4' : tomorrow ? 'var(--amber)' : past ? '#C47B7A' : soon ? '#D4A05A' : 'var(--text-3)'
 
   return (
-    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color, letterSpacing: '0.03em' }}>
+    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color, letterSpacing: '0.03em' }}>
       {label}
     </span>
   )
@@ -31,7 +31,7 @@ function Ratings({ metadata }) {
   return (
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '6px' }}>
       {items.map(({ label, val }) => (
-        <span key={label} style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', letterSpacing: '0.03em' }}>
+        <span key={label} style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-3)', letterSpacing: '0.03em' }}>
           <span style={{ color: 'var(--amber)', opacity: 0.8 }}>★</span>{' '}
           <span style={{ color: 'var(--text-2)' }}>{val}</span>
           <span style={{ color: 'var(--text-4)', marginLeft: '3px' }}>{label}</span>
@@ -59,7 +59,7 @@ function WatchCard({ todo, catColor }) {
         }}>
           {todo.title}
           {m?.year && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-4)', marginLeft: '8px', fontWeight: 400, fontStyle: 'normal' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)', marginLeft: '8px', fontWeight: 400, fontStyle: 'normal' }}>
               {m.year}
             </span>
           )}
@@ -98,8 +98,8 @@ function ReadCard({ todo }) {
         {m?.authors && (
           <p style={{ fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)', marginTop: '3px' }}>
             {m.authors}
-            {m.publishedYear && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '6px', fontSize: '11px', color: 'var(--text-4)' }}>{m.publishedYear}</span>}
-            {m.pageCount && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '6px', fontSize: '11px', color: 'var(--text-4)' }}>{m.pageCount}p</span>}
+            {m.publishedYear && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '6px', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)' }}>{m.publishedYear}</span>}
+            {m.pageCount && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '6px', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)' }}>{m.pageCount}p</span>}
           </p>
         )}
       </div>
@@ -163,7 +163,7 @@ export default function TodoCard({ todo, category }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={e => e.stopPropagation()}
-                  style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', textDecoration: 'none', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-3)', textDecoration: 'none', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                   onMouseEnter={e => e.currentTarget.style.color = 'var(--amber)'}
                   onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
                 >
@@ -174,7 +174,7 @@ export default function TodoCard({ todo, category }) {
               {hasExtras && (
                 <button
                   onClick={() => setExpanded(e => !e)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '3px', fontFamily: 'var(--font-ui)', fontSize: '11px', color: 'var(--text-4)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'color 0.15s ease' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '3px', fontFamily: 'var(--font-ui)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'color 0.15s ease' }}
                   onMouseEnter={e => e.currentTarget.style.color = 'var(--text-2)'}
                   onMouseLeave={e => e.currentTarget.style.color = 'var(--text-4)'}
                 >
