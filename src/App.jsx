@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { SlidersHorizontal, Plus } from 'lucide-react'
+import { SlidersHorizontal, Plus, Github } from 'lucide-react'
 import { db } from './db/index.js'
 import ProfileSelector from './components/ProfileSelector.jsx'
 import CategoryTabs from './components/CategoryTabs.jsx'
@@ -20,15 +20,28 @@ function Header({ profile, onSettings }) {
           {profile.name}
         </span>
       </div>
-      <button
-        onClick={onSettings}
-        style={{ color: 'var(--text-3)', padding: '8px', borderRadius: '8px', background: 'transparent', border: 'none', transition: 'color 0.15s ease, background 0.15s ease', cursor: 'pointer' }}
-        onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
-        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
-        aria-label="Settings"
-      >
-        <SlidersHorizontal size={18} strokeWidth={1.8} />
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+        <a
+          href="https://github.com/lcofre/stash"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--text-3)', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', transition: 'color 0.15s ease', opacity: 0.5 }}
+          onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.opacity = '1' }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.opacity = '0.5' }}
+          aria-label="GitHub repository"
+        >
+          <Github size={16} strokeWidth={1.6} />
+        </a>
+        <button
+          onClick={onSettings}
+          style={{ color: 'var(--text-3)', padding: '8px', borderRadius: '8px', background: 'transparent', border: 'none', transition: 'color 0.15s ease, background 0.15s ease', cursor: 'pointer' }}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
+          aria-label="Settings"
+        >
+          <SlidersHorizontal size={18} strokeWidth={1.8} />
+        </button>
+      </div>
     </header>
   )
 }
