@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { format, isToday, isTomorrow, isPast } from 'date-fns'
 import TodoCard from './TodoCard.jsx'
+import { useTodos, useTodosByProfile } from '../hooks/index.js'
 import { db } from '../db/index.js'
 
 function EmptyState({ icon, message, sub, onAdd }) {
@@ -43,14 +44,9 @@ function EmptyState({ icon, message, sub, onAdd }) {
 }
 
 function CalendarView({ profileId }) {
-  const todos = useLiveQuery(
-    () => db.todos
-      .where('profileId').equals(profileId)
-      .filter(t => !!t.date && !t.done)
-      .toArray()
-      .then(arr => arr.sort((a, b) => new Date(a.date) - new Date(b.date))),
-    [profileId]
-  )
+  const allTodos = useTodosByProfile(profileId)
+  const todos = allTodos?.filter(t => !!t.date && !t.done).sort((a, b) => new Date(a.date) - new Date(b.date))
+
   const categories = useLiveQuery(
     () => db.categories.where('profileId').equals(profileId).toArray(),
     [profileId]
@@ -110,25 +106,17 @@ export default function TodoList({ profileId, categoryId, onAdd }) {
     [categoryId, isCalendar]
   )
 
-  const todos = useLiveQuery(() => {
-    if (isCalendar || !categoryId) return undefined
-    return db.todos
-      .where('categoryId').equals(categoryId)
-      .toArray()
-      .then(arr => arr.sort((a, b) => {
-        if (a.done !== b.done) return a.done ? 1 : -1
-        return new Date(b.createdAt) - new Date(a.createdAt)
-      }))
-  }, [categoryId, isCalendar])
+  const categoryTodos = useTodos(categoryId && !isCalendar ? categoryId : null)
+  const todos = categoryTodos?.sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1
+    return new Date(b.createdAt) - new Date(a.createdAt)
+  })
 
-  const allTodos = useLiveQuery(() => {
-    if (categoryId) return undefined
-    return db.todos.where('profileId').equals(profileId).toArray()
-      .then(arr => arr.sort((a, b) => {
-        if (a.done !== b.done) return a.done ? 1 : -1
-        return new Date(b.createdAt) - new Date(a.createdAt)
-      }))
-  }, [profileId, categoryId])
+  const allProfileTodos = useTodosByProfile(profileId)
+  const allTodos = allProfileTodos?.sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1
+    return new Date(b.createdAt) - new Date(a.createdAt)
+  })
 
   if (isCalendar) {
     return (
@@ -138,7 +126,7 @@ export default function TodoList({ profileId, categoryId, onAdd }) {
     )
   }
 
-  const items = todos ?? allTodos ?? []
+  const items = (categoryId && !isCalendar ? todos : allTodos) ?? []
 
   if (!categoryId && items.length === 0) {
     return (
@@ -148,7 +136,7 @@ export default function TodoList({ profileId, categoryId, onAdd }) {
     )
   }
 
-  if (categoryId && (!todos || todos.length === 0)) {
+  if (categoryId && !isCalendar && (!todos || todos.length === 0)) {
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <EmptyState

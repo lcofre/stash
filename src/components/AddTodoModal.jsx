@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'lucide-react'
 import Modal from './ui/Modal.jsx'
 import WatchEnricher from './enrichers/WatchEnricher.jsx'
 import ReadEnricher from './enrichers/ReadEnricher.jsx'
-import { db } from '../db/index.js'
+import { useCategories } from '../hooks/index.js'
+import { todos as todoCommands } from '../commands/index.js'
 
 const labelStyle = {
   fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)',
@@ -20,10 +20,7 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
   const [selectedCategoryId, setSelectedCategoryId] = useState(categoryId)
   const [saving, setSaving] = useState(false)
 
-  const categories = useLiveQuery(
-    () => db.categories.where('profileId').equals(profileId).sortBy('order'),
-    [profileId]
-  )
+  const categories = useCategories(profileId)
 
   const activeCategory = categories?.find(c => c.id === selectedCategoryId) || categories?.[0]
   const type = activeCategory?.type || 'todo'
@@ -33,19 +30,20 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
     const finalTitle = title.trim() || metadata?.title || ''
     if (!finalTitle) return
     setSaving(true)
-    await db.todos.add({
-      profileId,
-      categoryId: activeCategory?.id,
-      title: finalTitle,
-      notes: notes.trim(),
-      date: date ? new Date(date + 'T12:00:00') : null,
-      url: url.trim() || null,
-      done: false,
-      metadata: metadata || null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    onClose()
+    try {
+      await todoCommands.addTodo({
+        profileId,
+        categoryId: activeCategory?.id,
+        title: finalTitle,
+        notes: notes.trim(),
+        date: date ? new Date(date + 'T12:00:00') : null,
+        url: url.trim() || null,
+        metadata: metadata || null,
+      })
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (

@@ -1,11 +1,7 @@
-import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from '../db/index.js'
+import { useCategories } from '../hooks/index.js'
 
 export default function CategoryTabs({ profileId, activeCategoryId, onSelect }) {
-  const categories = useLiveQuery(
-    () => db.categories.where('profileId').equals(profileId).sortBy('order'),
-    [profileId]
-  )
+  const categories = useCategories(profileId)
 
   if (!categories) {
     return <div style={{ height: '52px', background: 'var(--bg-2)', borderBottom: '1px solid var(--border-2)' }} />

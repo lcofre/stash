@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { format, isPast, isToday, isTomorrow, differenceInDays } from 'date-fns'
 import { Trash2, ExternalLink, ChevronDown } from 'lucide-react'
 import { TMDB_IMG } from '../api/tmdb.js'
-import { db } from '../db/index.js'
+import { todos as todoCommands } from '../commands/index.js'
 
 function DateLabel({ date }) {
   if (!date) return null
@@ -130,12 +130,15 @@ export default function TodoCard({ todo, category }) {
 
   async function toggleDone() {
     setChecking(true)
-    await db.todos.update(todo.id, { done: !todo.done, updatedAt: new Date() })
-    setTimeout(() => setChecking(false), 300)
+    try {
+      await todoCommands.toggleTodo(todo.id)
+    } finally {
+      setTimeout(() => setChecking(false), 300)
+    }
   }
 
   async function deleteTodo() {
-    await db.todos.delete(todo.id)
+    await todoCommands.deleteTodo(todo.id)
   }
 
   return (

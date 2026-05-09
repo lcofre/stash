@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { SlidersHorizontal, Plus } from 'lucide-react'
+import { useProfileList } from './hooks/index.js'
 
 function GithubIcon({ size = 16 }) {
   return (
@@ -9,7 +9,6 @@ function GithubIcon({ size = 16 }) {
     </svg>
   )
 }
-import { db } from './db/index.js'
 import ProfileSelector from './components/ProfileSelector.jsx'
 import CategoryTabs from './components/CategoryTabs.jsx'
 import TodoList from './components/TodoList.jsx'
@@ -71,7 +70,7 @@ export default function App() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
 
-  const profiles = useLiveQuery(() => db.profiles.toArray(), [])
+  const profiles = useProfileList()
 
   useEffect(() => {
     if (activeProfileId) localStorage.setItem('stash_profile', String(activeProfileId))
