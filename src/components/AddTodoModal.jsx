@@ -3,7 +3,7 @@ import { Link } from 'lucide-react'
 import Modal from './ui/Modal.jsx'
 import WatchEnricher from './enrichers/WatchEnricher.jsx'
 import ReadEnricher from './enrichers/ReadEnricher.jsx'
-import { useCategories } from '../hooks/index.js'
+import { useCategoryCache } from '../contexts/CategoryContext.jsx'
 import { todos as todoCommands } from '../commands/index.js'
 
 const labelStyle = {
@@ -20,7 +20,7 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
   const [selectedCategoryId, setSelectedCategoryId] = useState(categoryId)
   const [saving, setSaving] = useState(false)
 
-  const categories = useCategories(profileId)
+  const categories = useCategoryCache()
 
   const activeCategory = categories?.find(c => c.id === selectedCategoryId) || categories?.[0]
   const type = activeCategory?.type || 'todo'

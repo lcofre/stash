@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { SlidersHorizontal, Plus } from 'lucide-react'
 import { useProfileList } from './hooks/index.js'
+import { CategoryProvider } from './contexts/CategoryContext.jsx'
 
 function GithubIcon({ size = 16 }) {
   return (
@@ -84,20 +85,21 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)' }}>
-      <Header profile={activeProfile} onSettings={() => setShowSettings(true)} />
+    <CategoryProvider profileId={activeProfileId}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)' }}>
+        <Header profile={activeProfile} onSettings={() => setShowSettings(true)} />
 
-      <CategoryTabs
-        profileId={activeProfileId}
-        activeCategoryId={activeCategoryId}
-        onSelect={setActiveCategoryId}
-      />
+        <CategoryTabs
+          profileId={activeProfileId}
+          activeCategoryId={activeCategoryId}
+          onSelect={setActiveCategoryId}
+        />
 
-      <TodoList
-        profileId={activeProfileId}
-        categoryId={activeCategoryId}
-        onAdd={() => setShowAddModal(true)}
-      />
+        <TodoList
+          profileId={activeProfileId}
+          categoryId={activeCategoryId}
+          onAdd={() => setShowAddModal(true)}
+        />
 
       {/* FAB */}
       <button
@@ -146,6 +148,7 @@ export default function App() {
           onProfileCreated={(id) => { setActiveProfileId(id); setActiveCategoryId(null) }}
         />
       )}
-    </div>
+      </div>
+    </CategoryProvider>
   )
 }

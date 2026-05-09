@@ -1,7 +1,7 @@
-import { useCategories } from '../hooks/index.js'
+import { useCategoryCache } from '../contexts/CategoryContext.jsx'
 
 export default function CategoryTabs({ profileId, activeCategoryId, onSelect }) {
-  const categories = useCategories(profileId)
+  const categories = useCategoryCache()
 
   if (!categories) {
     return <div style={{ height: '52px', background: 'var(--bg-2)', borderBottom: '1px solid var(--border-2)' }} />
