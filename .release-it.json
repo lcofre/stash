@@ -5,7 +5,8 @@
     "tagAnnotation": "Release v${version}"
   },
   "github": {
-    "release": false
+    "release": true,
+    "releaseName": "v${version}"
   },
   "plugins": {
     "@release-it/conventional-changelog": {
