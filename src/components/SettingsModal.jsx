@@ -142,6 +142,8 @@ function CategoryManager({ profileId }) {
 function ProfileManager({ profileId, profiles, onSwitchProfile, onProfileCreated, onClose }) {
   const [newName, setNewName] = useState('')
   const [creating, setCreating] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [editingName, setEditingName] = useState('')
 
   async function handleCreate(e) {
     e.preventDefault()
@@ -165,6 +167,31 @@ function ProfileManager({ profileId, profiles, onSwitchProfile, onProfileCreated
     }
   }
 
+  async function saveProfileName(id) {
+    const trimmed = editingName.trim()
+    if (!trimmed) {
+      setEditingId(null)
+      return
+    }
+    await db.profiles.update(id, { name: trimmed })
+    setEditingId(null)
+    setEditingName('')
+  }
+
+  function startEdit(profile) {
+    setEditingId(profile.id)
+    setEditingName(profile.name)
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') {
+      saveProfileName(editingId)
+    } else if (e.key === 'Escape') {
+      setEditingId(null)
+      setEditingName('')
+    }
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       {profiles.map(p => (
@@ -181,25 +208,48 @@ function ProfileManager({ profileId, profiles, onSwitchProfile, onProfileCreated
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: 'var(--font-ui)', fontSize: '16px', color: 'var(--amber)', flexShrink: 0,
           }}>
-            {p.name[0].toUpperCase()}
+            {(editingId === p.id ? editingName : p.name)[0].toUpperCase()}
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontFamily: 'var(--font-ui)', fontSize: '14px', color: 'var(--text)', margin: 0 }}>{p.name}</p>
-            {p.id === profileId && <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--amber)', margin: 0, letterSpacing: '0.05em' }}>active</p>}
+            {editingId === p.id ? (
+              <input
+                type="text"
+                value={editingName}
+                onChange={e => setEditingName(e.target.value)}
+                onBlur={() => saveProfileName(p.id)}
+                onKeyDown={handleKeyDown}
+                autoFocus
+                className="field"
+                style={{ fontSize: '14px', width: '100%' }}
+              />
+            ) : (
+              <>
+                <p onClick={() => startEdit(p)} style={{ fontFamily: 'var(--font-ui)', fontSize: '14px', color: 'var(--text)', margin: 0, cursor: 'pointer', transition: 'opacity 0.15s ease' }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                  {p.name}
+                </p>
+                {p.id === profileId && <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--amber)', margin: 0, letterSpacing: '0.05em' }}>active</p>}
+              </>
+            )}
           </div>
-          {p.id !== profileId && (
-            <button onClick={() => { onSwitchProfile(p.id); onClose() }}
-              style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer', transition: 'all 0.15s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.color = 'var(--amber)'; e.currentTarget.style.borderColor = 'var(--amber-border)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}>
-              switch →
-            </button>
-          )}
-          {profiles.length > 1 && (
-            <button onClick={() => deleteProfile(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-4)', padding: '4px', transition: 'color 0.15s ease' }}
-              onMouseEnter={e => e.currentTarget.style.color = '#C47B7A'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-4)'}>
-              <Trash2 size={14} />
-            </button>
+          {editingId !== p.id && (
+            <>
+              {p.id !== profileId && (
+                <button onClick={() => { onSwitchProfile(p.id); onClose() }}
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer', transition: 'all 0.15s ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--amber)'; e.currentTarget.style.borderColor = 'var(--amber-border)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}>
+                  switch →
+                </button>
+              )}
+              {profiles.length > 1 && (
+                <button onClick={() => deleteProfile(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-4)', padding: '4px', transition: 'color 0.15s ease' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#C47B7A'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-4)'}>
+                  <Trash2 size={14} />
+                </button>
+              )}
+            </>
           )}
         </div>
       ))}
