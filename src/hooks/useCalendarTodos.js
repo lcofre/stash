@@ -10,6 +10,7 @@ export function useCalendarTodos(categoryId, options = {}) {
     let query = db.todos.where('profileId').equals(options.profileId)
 
     const todos = await query.toArray()
+    if (!Array.isArray(todos)) return {}
 
     // Filter: must have date, must be pending, optionally by category
     const filtered = todos.filter(t => {
