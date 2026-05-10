@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.10.2](https://github.com/lcofre/stash/compare/v0.10.1...v0.10.2) (2026-05-10)
+
+### Bug Fixes
+
+* calendar view filter on useTodosByProfile result ([828f038](https://github.com/lcofre/stash/commit/828f038f2acadf3fbd88d74b8a9867471089df99))
+
 ## [0.10.1](https://github.com/lcofre/stash/compare/v0.10.0...v0.10.1) (2026-05-10)
 
 ### Refactoring
