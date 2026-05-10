@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.10.0](https://github.com/lcofre/stash/compare/v0.9.0...v0.10.0) (2026-05-10)
+
+### Features
+
+* add edit modal and wire up todo editing ([47fd3f3](https://github.com/lcofre/stash/commit/47fd3f3f6bc3718937e166c995339fb75ef70ce1))
+
 ## [0.9.0](https://github.com/lcofre/stash/compare/v0.8.1...v0.9.0) (2026-05-10)
 
 ### Features
