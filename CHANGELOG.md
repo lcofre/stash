@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.8.1](https://github.com/lcofre/stash/compare/v0.8.0...v0.8.1) (2026-05-10)
+
+### Refactoring
+
+* remove category context, use hooks everywhere ([#16](https://github.com/lcofre/stash/issues/16)) ([c5a5501](https://github.com/lcofre/stash/commit/c5a5501ebbdab0ac8e4604af1e50e5f745e6297c))
+
 ## 0.8.0 (2026-05-10)
 
 ### Features
