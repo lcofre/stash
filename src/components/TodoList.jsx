@@ -388,7 +388,7 @@ function CalendarView({ profileId, selectedCategoryId, onEditTodo }) {
   )
 }
 
-export default function TodoList({ profileId, categoryId, onAdd }) {
+export default function TodoList({ profileId, categoryId, onAdd, onEdit }) {
   const isCalendar = categoryId === '__calendar__'
 
   const category = useLiveQuery(
@@ -413,7 +413,7 @@ export default function TodoList({ profileId, categoryId, onAdd }) {
       <CalendarView
         profileId={profileId}
         selectedCategoryId={null}
-        onEditTodo={() => {}}
+        onEditTodo={onEdit}
       />
     )
   }
@@ -448,7 +448,7 @@ export default function TodoList({ profileId, categoryId, onAdd }) {
     <div style={{ flex: 1, overflowY: 'auto' }}>
       <div className="flex flex-col gap-2 stagger" style={{ padding: '16px 14px 100px' }}>
         {pending.map(todo => (
-          <TodoCard key={todo.id} todo={todo} category={category} />
+          <TodoCard key={todo.id} todo={todo} category={category} onEdit={onEdit} />
         ))}
         {done.length > 0 && (
           <>
@@ -460,7 +460,7 @@ export default function TodoList({ profileId, categoryId, onAdd }) {
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
             </div>
             {done.map(todo => (
-              <TodoCard key={todo.id} todo={todo} category={category} />
+              <TodoCard key={todo.id} todo={todo} category={category} onEdit={onEdit} />
             ))}
           </>
         )}

@@ -121,7 +121,7 @@ function ContentRenderer({ todo, category }) {
   )
 }
 
-export default function TodoCard({ todo, category }) {
+export default function TodoCard({ todo, category, onEdit }) {
   const [expanded, setExpanded] = useState(false)
   const [checking, setChecking] = useState(false)
   const catColor = category?.color || 'var(--amber)'
@@ -146,7 +146,10 @@ export default function TodoCard({ todo, category }) {
   return (
     <div
       className={`card anim-fade-up${todo.done ? ' done' : ''}`}
-      style={{ position: 'relative', padding: '14px 14px 12px 20px', '--cat-color': catColor }}
+      onClick={() => !todo.done && onEdit?.(todo.id)}
+      style={{ position: 'relative', padding: '14px 14px 12px 20px', '--cat-color': catColor, cursor: todo.done ? 'default' : 'pointer', transition: 'opacity 0.15s ease' }}
+      onMouseEnter={e => { if (!todo.done) e.currentTarget.style.opacity = '0.85' }}
+      onMouseLeave={e => e.currentTarget.style.opacity = '1'}
     >
       {/* Left category bar */}
       <div className="cat-bar" />

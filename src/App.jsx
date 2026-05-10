@@ -9,10 +9,13 @@ function GithubIcon({ size = 16 }) {
     </svg>
   )
 }
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from './db/index.js'
 import ProfileSelector from './components/ProfileSelector.jsx'
 import CategoryTabs from './components/CategoryTabs.jsx'
 import TodoList from './components/TodoList.jsx'
 import AddTodoModal from './components/AddTodoModal.jsx'
+import EditTodoModal from './components/EditTodoModal.jsx'
 import SettingsModal from './components/SettingsModal.jsx'
 
 function Header({ profile, onSettings }) {
@@ -69,8 +72,13 @@ export default function App() {
   const [activeCategoryId, setActiveCategoryId] = useState(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [editingTodoId, setEditingTodoId] = useState(null)
 
   const profiles = useProfileList()
+  const editingTodo = useLiveQuery(
+    () => editingTodoId ? db.todos.get(editingTodoId) : null,
+    [editingTodoId]
+  )
 
   useEffect(() => {
     if (activeProfileId) localStorage.setItem('stash_profile', String(activeProfileId))
@@ -97,6 +105,7 @@ export default function App() {
           profileId={activeProfileId}
           categoryId={activeCategoryId}
           onAdd={() => setShowAddModal(true)}
+          onEdit={(todoId) => setEditingTodoId(todoId)}
         />
 
       {/* FAB */}
@@ -135,6 +144,13 @@ export default function App() {
           profileId={activeProfileId}
           categoryId={activeCategoryId !== '__calendar__' ? activeCategoryId : null}
           onClose={() => setShowAddModal(false)}
+        />
+      )}
+      {editingTodo && (
+        <EditTodoModal
+          profileId={activeProfileId}
+          todo={editingTodo}
+          onClose={() => setEditingTodoId(null)}
         />
       )}
       {showSettings && (
