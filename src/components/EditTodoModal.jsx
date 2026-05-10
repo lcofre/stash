@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'lucide-react'
 import Modal from './ui/Modal.jsx'
 import WatchEnricher from './enrichers/WatchEnricher.jsx'
 import ReadEnricher from './enrichers/ReadEnricher.jsx'
-import { useCategories } from '../hooks/index.js'
+import { useCategories, useTodoForm } from '../hooks/index.js'
 import { todos as todoCommands } from '../commands/index.js'
 
 const labelStyle = {
@@ -12,39 +12,13 @@ const labelStyle = {
 }
 
 export default function EditTodoModal({ profileId, todo, onClose }) {
-  const [form, setForm] = useState({
-    title: '',
-    notes: '',
-    date: '',
-    url: '',
-    metadata: null,
-    selectedCategoryId: null,
-  })
+  const { form, updateField, changeCategoryId } = useTodoForm(todo)
   const [saving, setSaving] = useState(false)
 
   const categories = useCategories(profileId)
 
-  // Initialize form with todo data
-  useEffect(() => {
-    if (todo) {
-      const dateStr = todo.date ? new Date(todo.date).toISOString().split('T')[0] : ''
-      setForm({
-        title: todo.title || '',
-        notes: todo.notes || '',
-        url: todo.url || '',
-        metadata: todo.metadata || null,
-        selectedCategoryId: todo.categoryId,
-        date: dateStr,
-      })
-    }
-  }, [todo])
-
-  const activeCategory = categories?.find(c => c.id === form.selectedCategoryId) || categories?.[0]
+  const activeCategory = categories?.find(c => c.id === form.categoryId) || categories?.[0]
   const type = activeCategory?.type || 'todo'
-
-  const updateForm = (updates) => {
-    setForm(prev => ({ ...prev, ...updates }))
-  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -54,7 +28,7 @@ export default function EditTodoModal({ profileId, todo, onClose }) {
     try {
       await todoCommands.updateTodo(todo.id, {
         title: finalTitle,
-        categoryId: activeCategory?.id,
+        categoryId: form.categoryId || activeCategory?.id,
         notes: form.notes.trim() || null,
         date: form.date ? new Date(form.date + 'T12:00:00') : null,
         url: form.url.trim() || null,
@@ -81,7 +55,7 @@ export default function EditTodoModal({ profileId, todo, onClose }) {
                   <button
                     key={cat.id}
                     type="button"
-                    onClick={() => { updateForm({ selectedCategoryId: cat.id, metadata: null }) }}
+                    onClick={() => changeCategoryId(cat.id)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '5px',
                       padding: '6px 12px',
@@ -107,13 +81,13 @@ export default function EditTodoModal({ profileId, todo, onClose }) {
         {type === 'watch' && (
           <div>
             <span style={labelStyle}>find it</span>
-            <WatchEnricher profileId={profileId} value={form.metadata} onChange={(m) => updateForm({ metadata: m })} />
+            <WatchEnricher profileId={profileId} value={form.metadata} onChange={m => updateField('metadata', m)} />
           </div>
         )}
         {type === 'read' && (
           <div>
             <span style={labelStyle}>find it</span>
-            <ReadEnricher value={form.metadata} onChange={(m) => updateForm({ metadata: m })} />
+            <ReadEnricher value={form.metadata} onChange={m => updateField('metadata', m)} />
           </div>
         )}
 
@@ -124,7 +98,7 @@ export default function EditTodoModal({ profileId, todo, onClose }) {
           </span>
           <input
             value={form.title}
-            onChange={e => updateForm({ title: e.target.value })}
+            onChange={e => updateField('title', e.target.value)}
             placeholder={
               type === 'watch' ? 'title of movie or show…' :
               type === 'read' ? 'book title or link…' :
@@ -146,7 +120,7 @@ export default function EditTodoModal({ profileId, todo, onClose }) {
               <input
                 type="url"
                 value={form.url}
-                onChange={e => updateForm({ url: e.target.value })}
+                onChange={e => updateField('url', e.target.value)}
                 placeholder="https://…"
                 className="field accent-focus"
                 style={{ paddingLeft: '34px' }}
@@ -161,7 +135,7 @@ export default function EditTodoModal({ profileId, todo, onClose }) {
           <input
             type="date"
             value={form.date}
-            onChange={e => updateForm({ date: e.target.value })}
+            onChange={e => updateField('date', e.target.value)}
             className="field accent-focus"
           />
         </div>
@@ -171,7 +145,7 @@ export default function EditTodoModal({ profileId, todo, onClose }) {
           <span style={labelStyle}>notes <span style={{ color: 'var(--text-4)', textTransform: 'none', letterSpacing: 0 }}>— optional</span></span>
           <textarea
             value={form.notes}
-            onChange={e => updateForm({ notes: e.target.value })}
+            onChange={e => updateField('notes', e.target.value)}
             placeholder="any thoughts…"
             rows={3}
             className="field accent-focus"

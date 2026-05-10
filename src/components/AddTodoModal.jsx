@@ -3,7 +3,7 @@ import { Link } from 'lucide-react'
 import Modal from './ui/Modal.jsx'
 import WatchEnricher from './enrichers/WatchEnricher.jsx'
 import ReadEnricher from './enrichers/ReadEnricher.jsx'
-import { useCategories } from '../hooks/index.js'
+import { useCategories, useTodoForm } from '../hooks/index.js'
 import { todos as todoCommands } from '../commands/index.js'
 
 const labelStyle = {
@@ -12,22 +12,17 @@ const labelStyle = {
 }
 
 export default function AddTodoModal({ profileId, categoryId, onClose }) {
-  const [title, setTitle] = useState('')
-  const [notes, setNotes] = useState('')
-  const [date, setDate] = useState('')
-  const [url, setUrl] = useState('')
-  const [metadata, setMetadata] = useState(null)
-  const [selectedCategoryId, setSelectedCategoryId] = useState(categoryId)
+  const { form, updateField, changeCategoryId } = useTodoForm(null)
   const [saving, setSaving] = useState(false)
 
   const categories = useCategories(profileId)
 
-  const activeCategory = categories?.find(c => c.id === selectedCategoryId) || categories?.[0]
+  const activeCategory = categories?.find(c => c.id === (form.categoryId || categoryId)) || categories?.[0]
   const type = activeCategory?.type || 'todo'
 
   async function handleSubmit(e) {
     e.preventDefault()
-    const finalTitle = title.trim() || metadata?.title || ''
+    const finalTitle = form.title.trim() || form.metadata?.title || ''
     if (!finalTitle) return
     setSaving(true)
     try {
@@ -35,10 +30,10 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
         profileId,
         categoryId: activeCategory?.id,
         title: finalTitle,
-        notes: notes.trim(),
-        date: date ? new Date(date + 'T12:00:00') : null,
-        url: url.trim() || null,
-        metadata: metadata || null,
+        notes: form.notes.trim(),
+        date: form.date ? new Date(form.date + 'T12:00:00') : null,
+        url: form.url.trim() || null,
+        metadata: form.metadata || null,
       })
       onClose()
     } finally {
@@ -61,7 +56,7 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
                   <button
                     key={cat.id}
                     type="button"
-                    onClick={() => { setSelectedCategoryId(cat.id); setMetadata(null) }}
+                    onClick={() => changeCategoryId(cat.id)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '5px',
                       padding: '6px 12px',
@@ -87,13 +82,13 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
         {type === 'watch' && (
           <div>
             <span style={labelStyle}>find it</span>
-            <WatchEnricher profileId={profileId} value={metadata} onChange={setMetadata} />
+            <WatchEnricher profileId={profileId} value={form.metadata} onChange={m => updateField('metadata', m)} />
           </div>
         )}
         {type === 'read' && (
           <div>
             <span style={labelStyle}>find it</span>
-            <ReadEnricher value={metadata} onChange={setMetadata} />
+            <ReadEnricher value={form.metadata} onChange={m => updateField('metadata', m)} />
           </div>
         )}
 
@@ -103,8 +98,8 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
             {type === 'watch' || type === 'read' ? 'or type manually' : 'title'}
           </span>
           <input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
+            value={form.title}
+            onChange={e => updateField('title', e.target.value)}
             placeholder={
               type === 'watch' ? 'title of movie or show…' :
               type === 'read' ? 'book title or link…' :
@@ -112,7 +107,7 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
               type === 'buy' ? 'what to buy…' : 'what needs doing…'
             }
             className="field accent-focus"
-            required={!metadata}
+            required={!form.metadata}
             autoFocus={type !== 'watch' && type !== 'read'}
           />
         </div>
@@ -125,8 +120,8 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
               <Link size={13} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-4)' }} />
               <input
                 type="url"
-                value={url}
-                onChange={e => setUrl(e.target.value)}
+                value={form.url}
+                onChange={e => updateField('url', e.target.value)}
                 placeholder="https://…"
                 className="field accent-focus"
                 style={{ paddingLeft: '34px' }}
@@ -140,8 +135,8 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
           <span style={labelStyle}>date <span style={{ color: 'var(--text-4)', textTransform: 'none', letterSpacing: 0 }}>— optional</span></span>
           <input
             type="date"
-            value={date}
-            onChange={e => setDate(e.target.value)}
+            value={form.date}
+            onChange={e => updateField('date', e.target.value)}
             className="field accent-focus"
           />
         </div>
@@ -150,8 +145,8 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
         <div>
           <span style={labelStyle}>notes <span style={{ color: 'var(--text-4)', textTransform: 'none', letterSpacing: 0 }}>— optional</span></span>
           <textarea
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
+            value={form.notes}
+            onChange={e => updateField('notes', e.target.value)}
             placeholder="any thoughts…"
             rows={3}
             className="field accent-focus"
@@ -166,7 +161,7 @@ export default function AddTodoModal({ profileId, categoryId, onClose }) {
           </button>
           <button
             type="submit"
-            disabled={saving || (!title.trim() && !metadata)}
+            disabled={saving || (!form.title.trim() && !form.metadata)}
             className="btn btn-primary"
             style={{ flex: 2 }}
           >

@@ -391,23 +391,7 @@ function CalendarView({ profileId, selectedCategoryId, onEditTodo }) {
 export default function TodoList({ profileId, categoryId, onAdd, onEdit }) {
   const isCalendar = categoryId === '__calendar__'
 
-  const category = useLiveQuery(
-    () => categoryId && !isCalendar ? db.categories.get(categoryId) : null,
-    [categoryId, isCalendar]
-  )
-
-  const categoryTodos = useTodos(categoryId && !isCalendar ? categoryId : null)
-  const todos = categoryTodos?.sort((a, b) => {
-    if (a.done !== b.done) return a.done ? 1 : -1
-    return new Date(b.createdAt) - new Date(a.createdAt)
-  })
-
-  const allProfileTodos = useTodosByProfile(profileId)
-  const allTodos = allProfileTodos?.sort((a, b) => {
-    if (a.done !== b.done) return a.done ? 1 : -1
-    return new Date(b.createdAt) - new Date(a.createdAt)
-  })
-
+  // Calendar view: different data structure and rendering entirely
   if (isCalendar) {
     return (
       <CalendarView
@@ -418,48 +402,45 @@ export default function TodoList({ profileId, categoryId, onAdd, onEdit }) {
     )
   }
 
-  const items = (categoryId && !isCalendar ? todos : allTodos) ?? []
+  // Category view: use new data layer hooks
+  const category = useLiveQuery(
+    () => categoryId ? db.categories.get(categoryId) : null,
+    [categoryId]
+  )
 
-  if (!categoryId && items.length === 0) {
-    return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <EmptyState icon="◻" message="your stash is empty" sub="tap ＋ to add something" onAdd={onAdd} />
-      </div>
-    )
-  }
+  // Data layer now owns ALL filtering and sorting
+  // Hook returns {pending, done} pre-computed and sorted by createdAt
+  const data = useTodos(categoryId)
 
-  if (categoryId && !isCalendar && (!todos || todos.length === 0)) {
+  if (!data || (data.pending.length === 0 && data.done.length === 0)) {
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <EmptyState
           icon={category?.icon}
-          message={`nothing in ${category?.name?.toLowerCase() || 'this list'}`}
-          sub="tap ＋ to stash something here"
+          message={categoryId ? `nothing in ${category?.name?.toLowerCase() || 'this list'}` : 'your stash is empty'}
+          sub={categoryId ? 'tap ＋ to stash something here' : 'tap ＋ to add something'}
           onAdd={onAdd}
         />
       </div>
     )
   }
 
-  const pending = items.filter(t => !t.done)
-  const done = items.filter(t => t.done)
-
   return (
     <div style={{ flex: 1, overflowY: 'auto' }}>
       <div className="flex flex-col gap-2 stagger" style={{ padding: '16px 14px 100px' }}>
-        {pending.map(todo => (
+        {data.pending.map(todo => (
           <TodoCard key={todo.id} todo={todo} category={category} onEdit={onEdit} />
         ))}
-        {done.length > 0 && (
+        {data.done.length > 0 && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0 4px' }}>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--sz-mono-xs)', color: 'var(--text-4)' }}>
-                done · {done.length}
+                done · {data.done.length}
               </span>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
             </div>
-            {done.map(todo => (
+            {data.done.map(todo => (
               <TodoCard key={todo.id} todo={todo} category={category} onEdit={onEdit} />
             ))}
           </>
