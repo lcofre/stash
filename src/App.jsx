@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { SlidersHorizontal, Plus } from 'lucide-react'
 import { useProfileList } from './hooks/index.js'
-import { CategoryProvider } from './contexts/CategoryContext.jsx'
 
 function GithubIcon({ size = 16 }) {
   return (
@@ -85,8 +84,7 @@ export default function App() {
   }
 
   return (
-    <CategoryProvider profileId={activeProfileId}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)' }}>
         <Header profile={activeProfile} onSettings={() => setShowSettings(true)} />
 
         <CategoryTabs
@@ -149,6 +147,5 @@ export default function App() {
         />
       )}
       </div>
-    </CategoryProvider>
   )
 }
