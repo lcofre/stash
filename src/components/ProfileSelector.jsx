@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createProfile } from '../db/index.js'
+import { createProfile } from '../commands/profiles.js'
 
 function ProfileRow({ profile, onSelect }) {
   return (

@@ -1,8 +1,11 @@
 import { db } from '../db/index.js'
+import { cascadeDeleteCategory } from './cascades.js'
+import { validateCategoryExists, validateProfileExists } from './validation.js'
 
 export async function createCategory({ profileId, name, type, icon, color }) {
   if (!name?.trim()) throw new Error('Category name is required')
-  if (!['watch', 'read', 'todo'].includes(type)) throw new Error('Invalid category type')
+  if (!['watch', 'read', 'todo', 'research', 'buy'].includes(type)) throw new Error('Invalid category type')
+  await validateProfileExists(profileId)
 
   const order = await db.categories
     .where('profileId').equals(profileId)
@@ -28,8 +31,8 @@ export async function updateCategory(categoryId, updates) {
 }
 
 export async function deleteCategory(categoryId) {
-  await db.todos.where('categoryId').equals(categoryId).delete()
-  return db.categories.delete(categoryId)
+  await validateCategoryExists(categoryId)
+  return cascadeDeleteCategory(categoryId)
 }
 
 export async function reorderCategories(profileId, categoryIds) {

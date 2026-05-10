@@ -1,9 +1,22 @@
+import { APIError, parseAPIError } from './errors.js'
+
 const BASE = 'https://www.omdbapi.com'
 
 export async function getOMDBRating(imdbId, apiKey) {
-  if (!apiKey || !imdbId) return null
-  const res = await fetch(`${BASE}/?i=${imdbId}&apikey=${apiKey}`)
-  if (!res.ok) return null
+  if (!apiKey) throw new APIError('auth', 'NO_KEY', 'OMDB API key not configured')
+  if (!imdbId) return null
+
+  let res
+  try {
+    res = await fetch(`${BASE}/?i=${imdbId}&apikey=${apiKey}`)
+  } catch (error) {
+    const apiError = parseAPIError(error, null)
+    throw apiError
+  }
+
+  const err = parseAPIError(null, res)
+  if (err) throw err
+
   const data = await res.json()
   if (data.Response === 'False') return null
   const ratings = {}
@@ -14,10 +27,21 @@ export async function getOMDBRating(imdbId, apiKey) {
 }
 
 export async function searchOMDB(title, year, apiKey) {
-  if (!apiKey || !title.trim()) return null
+  if (!apiKey) throw new APIError('auth', 'NO_KEY', 'OMDB API key not configured')
+  if (!title.trim()) return null
+
   const yearParam = year ? `&y=${year}` : ''
-  const res = await fetch(`${BASE}/?t=${encodeURIComponent(title)}${yearParam}&apikey=${apiKey}`)
-  if (!res.ok) return null
+  let res
+  try {
+    res = await fetch(`${BASE}/?t=${encodeURIComponent(title)}${yearParam}&apikey=${apiKey}`)
+  } catch (error) {
+    const apiError = parseAPIError(error, null)
+    throw apiError
+  }
+
+  const err = parseAPIError(null, res)
+  if (err) throw err
+
   const data = await res.json()
   if (data.Response === 'False') return null
   const ratings = {}

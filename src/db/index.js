@@ -1,4 +1,5 @@
 import Dexie from 'dexie'
+import { validateImportSchema, RollbackQueue } from '../commands/validation.js'
 
 export const db = new Dexie('stash')
 
@@ -47,26 +48,45 @@ export async function exportProfile(profileId) {
 
 export async function importProfile(json) {
   const data = JSON.parse(json)
+
+  // Validate schema
+  validateImportSchema(data)
+
   const { profile, categories, todos, settings } = data
-  const newProfileId = await db.profiles.add({ name: profile.name + ' (imported)', createdAt: new Date() })
-  const idMap = {}
-  for (const cat of categories) {
-    const oldId = cat.id
-    const { id: _id, ...rest } = cat
-    const newId = await db.categories.add({ ...rest, profileId: newProfileId })
-    idMap[oldId] = newId
+  const rollback = new RollbackQueue()
+
+  try {
+    const newProfileId = await db.profiles.add({ name: profile.name + ' (imported)', createdAt: new Date() })
+    rollback.add(() => db.profiles.delete(newProfileId))
+
+    const idMap = {}
+    for (const cat of categories) {
+      const oldId = cat.id
+      const { id: _id, ...rest } = cat
+      const newId = await db.categories.add({ ...rest, profileId: newProfileId })
+      idMap[oldId] = newId
+      rollback.add(() => db.categories.delete(newId))
+    }
+
+    for (const todo of todos) {
+      const { id: _id, ...rest } = todo
+      const newTodoId = await db.todos.add({
+        ...rest,
+        profileId: newProfileId,
+        categoryId: idMap[todo.categoryId] ?? todo.categoryId,
+      })
+      rollback.add(() => db.todos.delete(newTodoId))
+    }
+
+    if (settings) {
+      const { profileId: _pid, ...restSettings } = settings
+      await db.settings.add({ ...restSettings, profileId: newProfileId })
+      rollback.add(() => db.settings.delete(newProfileId))
+    }
+
+    return newProfileId
+  } catch (error) {
+    await rollback.execute()
+    throw error
   }
-  for (const todo of todos) {
-    const { id: _id, ...rest } = todo
-    await db.todos.add({
-      ...rest,
-      profileId: newProfileId,
-      categoryId: idMap[todo.categoryId] ?? todo.categoryId,
-    })
-  }
-  if (settings) {
-    const { profileId: _pid, ...restSettings } = settings
-    await db.settings.add({ ...restSettings, profileId: newProfileId })
-  }
-  return newProfileId
 }

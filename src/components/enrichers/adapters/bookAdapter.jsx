@@ -2,8 +2,19 @@ import { searchBooks } from '../../../api/googleBooks.js'
 
 const monoSm = { fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', letterSpacing: '0.03em' }
 
+/**
+ * Book adapter config schema:
+ * No API keys required (uses free Google Books API)
+ */
+
 export const bookAdapter = {
   placeholder: 'search books…',
+
+  // Config schema for validation
+  configSchema: {
+    required: [],
+    optional: [],
+  },
 
   async search(query) {
     return searchBooks(query)

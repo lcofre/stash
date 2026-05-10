@@ -1,9 +1,23 @@
-import { searchTMDB, searchOMDB, TMDB_IMG } from '../../../api/tmdb.js'
+import { searchTMDB, TMDB_IMG } from '../../../api/tmdb.js'
+import { searchOMDB } from '../../../api/omdb.js'
 
 const monoSm = { fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-3)', letterSpacing: '0.03em' }
 
+/**
+ * Movie/TV adapter config schema:
+ * @typedef {Object} MovieAdapterConfig
+ * @property {string} tmdbApiKey - TMDB API key (required)
+ * @property {string} [omdbApiKey] - OMDB API key (optional, for additional ratings)
+ */
+
 export const movieAdapter = {
   placeholder: 'search movies & TV shows…',
+
+  // Config schema for validation
+  configSchema: {
+    required: ['tmdbApiKey'],
+    optional: ['omdbApiKey'],
+  },
 
   async search(query, { tmdbApiKey }) {
     if (!tmdbApiKey) {

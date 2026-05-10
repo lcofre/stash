@@ -1,7 +1,17 @@
 import { db } from '../db/index.js'
+import { validateProfileExists, validateCategoryExists, validateTodoExists } from './validation.js'
 
 export async function addTodo({ profileId, categoryId, title, notes, date, url, metadata }) {
   if (!title?.trim()) throw new Error('Title is required')
+
+  await validateProfileExists(profileId)
+  if (categoryId) {
+    await validateCategoryExists(categoryId)
+    const category = await db.categories.get(categoryId)
+    if (category.profileId !== profileId) {
+      throw new Error('Category does not belong to this profile')
+    }
+  }
 
   return db.todos.add({
     profileId,
@@ -19,7 +29,7 @@ export async function addTodo({ profileId, categoryId, title, notes, date, url, 
 
 export async function toggleTodo(todoId) {
   const todo = await db.todos.get(todoId)
-  if (!todo) throw new Error('Todo not found')
+  await validateTodoExists(todoId)
 
   return db.todos.update(todoId, {
     done: !todo.done,
@@ -35,5 +45,6 @@ export async function updateTodo(todoId, updates) {
 }
 
 export async function deleteTodo(todoId) {
+  await validateTodoExists(todoId)
   return db.todos.delete(todoId)
 }

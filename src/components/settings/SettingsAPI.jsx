@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useSettings } from '../../hooks/index.js'
-import { db } from '../../db/index.js'
+import { updateApiKey } from '../../commands/settings.js'
 
 const label = (text) => (
   <span style={{ fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)', display: 'block', marginBottom: '8px' }}>
@@ -15,7 +15,7 @@ export default function SettingsAPI({ profileId }) {
   const [showOmdb, setShowOmdb] = useState(false)
 
   async function update(field, value) {
-    await db.settings.update(profileId, { [field]: value })
+    await updateApiKey(profileId, field, value)
   }
 
   if (!settings) return null

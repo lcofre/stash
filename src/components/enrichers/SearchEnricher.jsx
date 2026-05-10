@@ -15,6 +15,23 @@ export default function SearchEnricher({
   const [error, setError] = useState('')
   const timerRef = useRef(null)
 
+  // Validate adapter config on mount or when adapter changes
+  useEffect(() => {
+    if (adapter?.configSchema) {
+      const { required = [], optional = [] } = adapter.configSchema
+      const validKeys = [...required, ...optional]
+      const missingRequired = required.filter(key => !config?.[key])
+      const unknownKeys = Object.keys(config || {}).filter(k => !validKeys.includes(k))
+
+      if (missingRequired.length > 0) {
+        console.warn(`Adapter missing required config: ${missingRequired.join(', ')}`)
+      }
+      if (unknownKeys.length > 0) {
+        console.warn(`Unknown config keys: ${unknownKeys.join(', ')}`)
+      }
+    }
+  }, [adapter, config])
+
   useEffect(() => {
     if (!query.trim()) {
       setResults([])
