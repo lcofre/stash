@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.9.0](https://github.com/lcofre/stash/compare/v0.8.1...v0.9.0) (2026-05-10)
+
+### Features
+
+* add calendar grid view for todos with dates ([#19](https://github.com/lcofre/stash/issues/19)) ([3cca707](https://github.com/lcofre/stash/commit/3cca707420a1781c5fe0383aff1430ab3e38ef0b))
+
 ## [0.8.1](https://github.com/lcofre/stash/compare/v0.8.0...v0.8.1) (2026-05-10)
 
 ### Refactoring
