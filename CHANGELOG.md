@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.10.3](https://github.com/lcofre/stash/compare/v0.10.2...v0.10.3) (2026-05-10)
+
+### Bug Fixes
+
+* add defensive checks for corrupted indexeddb data ([e7aabcb](https://github.com/lcofre/stash/commit/e7aabcb6f3eab7a2cf6dfcb3dc8312378e7ab382))
+* add diagnostic logging and recovery utilities for corrupted data ([7e5268c](https://github.com/lcofre/stash/commit/7e5268cc1a6de09cccbe84778c35bd9862a17073))
+
 ## [0.10.2](https://github.com/lcofre/stash/compare/v0.10.1...v0.10.2) (2026-05-10)
 
 ### Bug Fixes
