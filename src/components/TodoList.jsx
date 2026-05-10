@@ -132,7 +132,7 @@ function CalendarView({ profileId, selectedCategoryId, onEditTodo }) {
   if (!allTodos || !allCategories) return null
 
   // Filter todos: dated, not done, and match category filter
-  const filteredTodos = allTodos.filter(t => {
+  const filteredTodos = allTodos.all.filter(t => {
     if (!t.date || t.done) return false
     if (selectedCategoryId && t.categoryId !== selectedCategoryId) return false
     return true
