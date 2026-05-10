@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.10.1](https://github.com/lcofre/stash/compare/v0.10.0...v0.10.1) (2026-05-10)
+
+### Refactoring
+
+* migrate AddTodoModal and EditTodoModal to useTodoForm hook ([b3d61cc](https://github.com/lcofre/stash/commit/b3d61cc3e812b1a9944055314ead6849d7194170)), closes [#2](https://github.com/lcofre/stash/issues/2)
+
+### Documentation
+
+* update ARCHITECTURE.md with completed modal migration ([cd9206d](https://github.com/lcofre/stash/commit/cd9206d9e5224e2bb5c465afc46fdb9e14eb5cb9))
+
 ## [0.10.0](https://github.com/lcofre/stash/compare/v0.9.0...v0.10.0) (2026-05-10)
 
 ### Features
