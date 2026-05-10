@@ -23,7 +23,10 @@ export function useTodos(categoryId, options = {}) {
       : db.todos.toCollection()
 
     return query.toArray().then(todos => {
-      if (!Array.isArray(todos)) todos = []
+      if (!Array.isArray(todos)) {
+        console.warn('[stash] IndexedDB returned non-array for useTodos query', { type: typeof todos, value: todos })
+        todos = []
+      }
       const pending = todos.filter(t => !t.done)
       const done = todos.filter(t => t.done)
 
@@ -44,7 +47,10 @@ export function useTodosByProfile(profileId, options = {}) {
 
   return useLiveQuery(() => {
     return db.todos.where('profileId').equals(profileId).toArray().then(todos => {
-      if (!Array.isArray(todos)) todos = []
+      if (!Array.isArray(todos)) {
+        console.warn('[stash] IndexedDB returned non-array for useTodosByProfile query', { type: typeof todos, value: todos })
+        todos = []
+      }
       const pending = todos.filter(t => !t.done)
       const done = todos.filter(t => t.done)
 

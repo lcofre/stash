@@ -10,7 +10,10 @@ export function useCalendarTodos(categoryId, options = {}) {
     let query = db.todos.where('profileId').equals(options.profileId)
 
     const todos = await query.toArray()
-    if (!Array.isArray(todos)) return {}
+    if (!Array.isArray(todos)) {
+      console.warn('[stash] IndexedDB returned non-array for useCalendarTodos query', { type: typeof todos, value: todos })
+      return {}
+    }
 
     // Filter: must have date, must be pending, optionally by category
     const filtered = todos.filter(t => {
