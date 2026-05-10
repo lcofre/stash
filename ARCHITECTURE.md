@@ -139,6 +139,8 @@ This becomes the reference for future changes. Adds 200+ lines of clarity for ma
 | TodoList lines of logic | 79 | 42 | -47% |
 | Sorting logic copies | 3 (TodoList, CalendarView, inline) | 1 (hooks/useTodos.js) | 66% consolidation |
 | Form state copies | 2 (AddTodoModal, EditTodoModal) | 1 (useTodoForm) | 50% consolidation |
+| Modal init complexity | useEffect + state duplication | Unified hook init | Single pattern |
+| Form field changes | Scattered (6 setState in AddTodo, 1 updateForm in EditTodo) | Unified updateField method | Consistent API |
 | Type string locations | 5 (db, commands, AddTodoModal, EditTodoModal, SettingsCategories) | 1 + imports (domain/categoryTypes.js) | Single source of truth |
 | Data access patterns | Dexie queries scattered | Purposeful hooks | Uniform contract |
 
@@ -176,6 +178,40 @@ test('excludes done and undated todos', ...)
 test('initializes form with todo data', ...)
 test('clears metadata when categoryId type changes', ...)
 test('validates metadata against schema', ...)
+test('returns updateField and changeCategoryId methods', ...)
+```
+
+#### Modal Consolidation (AddTodoModal & EditTodoModal)
+
+Both modals had near-identical form logic but different state shapes. Unified via useTodoForm:
+
+**Before (AddTodoModal)**
+```javascript
+const [title, setTitle] = useState('')
+const [notes, setNotes] = useState('')
+const [date, setDate] = useState('')
+const [url, setUrl] = useState('')
+const [metadata, setMetadata] = useState(null)
+const [selectedCategoryId, setSelectedCategoryId] = useState(categoryId)
+// ... 6 individual setState calls scattered through JSX
+onChange={e => setTitle(e.target.value)}
+onClick={() => { setSelectedCategoryId(cat.id); setMetadata(null) }}
+```
+
+**Before (EditTodoModal)**
+```javascript
+const [form, setForm] = useState({title: '', notes: '', ...})
+useEffect(() => { /* manual form init */ }, [todo])
+const updateForm = (updates) => setForm(prev => ({...prev, ...updates}))
+// ... different state shape and handlers
+```
+
+**After (Both)**
+```javascript
+const { form, updateField, changeCategoryId } = useTodoForm(initialTodo)
+// Single state object, unified API
+onChange={e => updateField('title', e.target.value)}
+onClick={() => changeCategoryId(cat.id)}
 ```
 
 ### Components
@@ -192,13 +228,17 @@ test('shows empty state when no todos', ...)
 
 ## Migration Path (If Extending Further)
 
-If you want to deepen further:
+Completed in recent commits:
+- ✓ **Refactor AddTodoModal** to use useTodoForm (commit: b3d61cc)
+- ✓ **Refactor EditTodoModal** to use useTodoForm (commit: b3d61cc)
+- ✓ **Refactor CalendarView** to use useCalendarTodos (done in this refactor)
 
-1. **Refactor AddTodoModal** to use useTodoForm
-2. **Refactor EditTodoModal** to use useTodoForm  
-3. **Refactor CalendarView** to use useCalendarTodos (already done in this refactor)
-4. **Add View Mode Context** to replace magic strings
-5. **Add Profile Context** to remove prop threading
-6. **Consolidate useMutation** adoption across SettingsAPI, SettingsCategories, etc.
+Remaining deepening opportunities:
+
+1. **Add View Mode Context** to replace magic strings
+2. **Add Profile Context** to remove prop threading
+3. **Consolidate useMutation** adoption across SettingsAPI, SettingsCategories, etc.
+4. **Metadata Validation at Command Layer** — Validate before DB write, not just in UI
+5. **ContentRenderer Extraction** — Move out of TodoCard, make it testable independently
 
 Each step further reduces scatter and improves testability.
