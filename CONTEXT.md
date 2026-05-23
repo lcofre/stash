@@ -35,7 +35,7 @@ The app has two view modes:
 - **Category View**: Shows todos for a selected category (or all todos if no category selected). Todos are split into pending and done.
 - **Calendar View**: Shows all pending todos with dates, organized by date in a calendar grid.
 
-View mode is controlled by `activeCategoryId` in App state. The special value `'__calendar__'` triggers calendar view (see TODO: #4 for refactoring this).
+View mode is controlled by `activeCategoryId` in App state. The special value `'__calendar__'` triggers calendar view — this is a deliberate magic-string hack to reuse the existing `activeCategoryId` slot without adding a separate view-mode field (see TODO: #4 for refactoring this into a proper discriminated union). When `activeCategoryId === '__calendar__'`, the app passes `null` as `categoryId` to `AddTodoModal` to prevent calendar-view leaking into the new-item form.
 
 ### Enrichment
 Process of augmenting a todo with external data:
@@ -45,6 +45,14 @@ Process of augmenting a todo with external data:
 4. ContentRenderer displays it in TodoCard
 
 Example: WatchEnricher → SearchEnricher → movieAdapter.onSelect() → calls TMDB API → returns {tmdbRating, year, genres, ...} → stored in todo.metadata → TodoCard.ContentRenderer displays it.
+
+### ContentRenderer
+Private component inside `TodoCard.jsx` that decides how to render a todo's title area based on what's in `todo.metadata`:
+- If `metadata.mediaType` is set → render movie/TV layout (poster, year, genres, ratings).
+- If `metadata.googleId` is set → render book layout (cover, authors, page count).
+- Otherwise → render plain title paragraph.
+
+`ContentRenderer` is intentionally colocated with `TodoCard` (not exported). Enrichment display logic lives here; enrichment fetch logic lives in the `enrichers/` components.
 
 ---
 
@@ -94,18 +102,55 @@ Where Record key is ISO date string: `{'2026-05-10': [todos], '2026-05-11': [tod
 
 ---
 
+## Commands Layer
+
+All writes go through `src/commands/`, never directly to `db`. Each command module exports async functions that validate inputs and call Dexie.
+
+### `commands/todos.js`
+- `addTodo({ profileId, categoryId, title, notes, date, url, metadata })` — creates a new todo. Validates profile and category ownership.
+- `toggleTodo(todoId)` — flips `done` boolean.
+- `updateTodo(todoId, updates)` — applies a partial update. Merges `updatedAt`.
+- `deleteTodo(todoId)` — removes the todo after existence check.
+
+### Other command modules
+- `commands/categories.js` — add, update, delete category; handles cascades (see `cascades.js`).
+- `commands/profiles.js` — create, rename, delete profile.
+- `commands/settings.js` — read/write app-level settings.
+
+Commands are imported by components via the barrel: `import { todos as todoCommands } from '../commands/index.js'`.
+
+---
+
+## Mutation Hook
+
+### `useMutation(mutationFn)`
+Thin wrapper that adds loading/error state to any async command call. Located at `src/hooks/useMutation.js`.
+
+Returns: `{ mutate, isLoading, error }`
+
+- `mutate(...args)` — calls `mutationFn`, sets `isLoading` while running, captures any thrown error into `error`.
+- Components use this to avoid duplicating try/catch + loading-flag boilerplate.
+
+Example usage:
+```javascript
+const { mutate: save, isLoading } = useMutation(todoCommands.addTodo)
+await save({ profileId, categoryId, title })
+```
+
+---
+
 ## Form State
 
 ### useTodoForm(initialTodo?)
 Manages todo form state for add/edit modals.
 
-Returns: `{form, updateField, changeCategoryId, reset, validateMetadata}`
+Returns: `{form, updateField, changeCategoryId, reset, validateForm}`
 
 - `form`: `{title, notes, date, url, categoryId, metadata}`
 - `updateField(field, value)`: Update a single field
 - `changeCategoryId(newId)`: Change category (clears metadata on type change)
 - `reset()`: Reset to initial state
-- `validateMetadata(metadata, categoryType)`: Validate metadata against schema
+- `validateForm(categoryType)`: Delegates to `validateMetadata(form.metadata, categoryType)` from `domain/categoryTypes.js`; returns `{valid, errors}`
 
 **Key behavior:**
 - When categoryId changes to a different type, metadata is cleared
