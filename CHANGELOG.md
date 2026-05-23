@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.10.4](https://github.com/lcofre/stash/compare/v0.10.3...v0.10.4) (2026-05-23)
+
 ## [0.10.3](https://github.com/lcofre/stash/compare/v0.10.2...v0.10.3) (2026-05-10)
 
 ### Bug Fixes
