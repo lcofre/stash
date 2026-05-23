@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { SlidersHorizontal, Plus } from 'lucide-react'
 import { useProfileList } from './hooks/index.js'
 import { ProfileProvider } from './contexts/ProfileContext.jsx'
+import { VIEW_MODES } from './domain/viewModes.js'
 
 function GithubIcon({ size = 16 }) {
   return (
@@ -141,7 +142,7 @@ export default function App() {
 
         {showAddModal && (
           <AddTodoModal
-            categoryId={activeCategoryId !== '__calendar__' ? activeCategoryId : null}
+            categoryId={activeCategoryId !== VIEW_MODES.CALENDAR ? activeCategoryId : null}
             onClose={() => setShowAddModal(false)}
           />
         )}

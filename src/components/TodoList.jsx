@@ -2,9 +2,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { format, isToday, getMonth, getYear, startOfMonth, getDaysInMonth, addMonths } from 'date-fns'
 import { useState } from 'react'
 import TodoCard from './TodoCard.jsx'
-import { useTodos, useTodosByProfile, useCategories } from '../hooks/index.js'
+import { useTodos, useCalendarTodos, useCategories } from '../hooks/index.js'
 import { db } from '../db/index.js'
 import { useProfileId } from '../contexts/ProfileContext.jsx'
+import { VIEW_MODES } from '../domain/viewModes.js'
 
 function EmptyState({ icon, message, sub, onAdd }) {
   const defaultIcon = icon ? (
@@ -128,29 +129,13 @@ function CalendarView({ selectedCategoryId, onEditTodo }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [popoverState, setPopoverState] = useState(null)
 
-  const allTodos = useTodosByProfile(profileId)
+  const todosByDate = useCalendarTodos(selectedCategoryId, { profileId }) || {}
   const allCategories = useCategories(profileId)
 
-  if (!allTodos || !allCategories) return null
+  if (!allCategories) return null
 
-  // Filter todos: dated, not done, and match category filter
-  const filteredTodos = allTodos.all.filter(t => {
-    if (!t.date || t.done) return false
-    if (selectedCategoryId && t.categoryId !== selectedCategoryId) return false
-    return true
-  })
-
-  if (filteredTodos.length === 0) {
+  if (Object.keys(todosByDate).length === 0) {
     return <EmptyState icon="◫" message="no dated items" sub="add a date to any item to see it here" />
-  }
-
-  // Map todos by date
-  const todosByDate = {}
-  for (const todo of filteredTodos) {
-    const d = new Date(todo.date)
-    const dateKey = format(d, 'yyyy-MM-dd')
-    if (!todosByDate[dateKey]) todosByDate[dateKey] = []
-    todosByDate[dateKey].push(todo)
   }
 
   // Calculate calendar grid
@@ -391,7 +376,7 @@ function CalendarView({ selectedCategoryId, onEditTodo }) {
 }
 
 export default function TodoList({ categoryId, onAdd, onEdit }) {
-  const isCalendar = categoryId === '__calendar__'
+  const isCalendar = categoryId === VIEW_MODES.CALENDAR
 
   // Calendar view: different data structure and rendering entirely
   if (isCalendar) {

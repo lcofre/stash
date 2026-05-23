@@ -1,5 +1,6 @@
 import { useCategories } from '../hooks/index.js'
 import { useProfileId } from '../contexts/ProfileContext.jsx'
+import { VIEW_MODES } from '../domain/viewModes.js'
 
 export default function CategoryTabs({ activeCategoryId, onSelect }) {
   const profileId = useProfileId()
@@ -11,7 +12,7 @@ export default function CategoryTabs({ activeCategoryId, onSelect }) {
 
   const allItems = [
     ...categories,
-    { id: '__calendar__', name: 'Calendar', icon: '◫', color: 'var(--text-3)' },
+    { id: VIEW_MODES.CALENDAR, name: 'Calendar', icon: '◫', color: 'var(--text-3)' },
   ]
 
   return (
