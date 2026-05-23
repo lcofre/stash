@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.11.0](https://github.com/lcofre/stash/compare/v0.10.4...v0.11.0) (2026-05-23)
+
+### Features
+
+* add ProfileId context to remove prop threading ([#25](https://github.com/lcofre/stash/issues/25)) ([4a4d4ae](https://github.com/lcofre/stash/commit/4a4d4ae84a731cfa09b16748a1e16031a419897f)), closes [#26](https://github.com/lcofre/stash/issues/26)
+* extract ContentRenderer as standalone component ([#28](https://github.com/lcofre/stash/issues/28)) ([8df626d](https://github.com/lcofre/stash/commit/8df626db2c875e6af5423c9bb0a7c7c048eea3fd))
+* replace __calendar__ magic string with VIEW_MODES enum ([#24](https://github.com/lcofre/stash/issues/24)) ([862963f](https://github.com/lcofre/stash/commit/862963f32b24711cb5ba11b9ccf37abf2c1005a0)), closes [#20](https://github.com/lcofre/stash/issues/20)
+* validate and strip metadata at command layer ([#27](https://github.com/lcofre/stash/issues/27)) ([de5a720](https://github.com/lcofre/stash/commit/de5a7202db030d5e01d8afd366ef7e08c7db6145))
+
+### Documentation
+
+* update CONTEXT.md with domain glossary and commands layer ([#23](https://github.com/lcofre/stash/issues/23)) ([9c922c8](https://github.com/lcofre/stash/commit/9c922c88e6e5c28fa428b5d8ee4da6579703720e))
+
 ## [0.10.4](https://github.com/lcofre/stash/compare/v0.10.3...v0.10.4) (2026-05-23)
 
 ## [0.10.3](https://github.com/lcofre/stash/compare/v0.10.2...v0.10.3) (2026-05-10)
