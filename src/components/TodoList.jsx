@@ -4,6 +4,7 @@ import { useState } from 'react'
 import TodoCard from './TodoCard.jsx'
 import { useTodos, useTodosByProfile, useCategories } from '../hooks/index.js'
 import { db } from '../db/index.js'
+import { useProfileId } from '../contexts/ProfileContext.jsx'
 
 function EmptyState({ icon, message, sub, onAdd }) {
   const defaultIcon = icon ? (
@@ -122,7 +123,8 @@ function CalendarPopover({ todos, categories, x, y, onClose, onEditTodo }) {
   )
 }
 
-function CalendarView({ profileId, selectedCategoryId, onEditTodo }) {
+function CalendarView({ selectedCategoryId, onEditTodo }) {
+  const profileId = useProfileId()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [popoverState, setPopoverState] = useState(null)
 
@@ -388,14 +390,13 @@ function CalendarView({ profileId, selectedCategoryId, onEditTodo }) {
   )
 }
 
-export default function TodoList({ profileId, categoryId, onAdd, onEdit }) {
+export default function TodoList({ categoryId, onAdd, onEdit }) {
   const isCalendar = categoryId === '__calendar__'
 
   // Calendar view: different data structure and rendering entirely
   if (isCalendar) {
     return (
       <CalendarView
-        profileId={profileId}
         selectedCategoryId={null}
         onEditTodo={onEdit}
       />

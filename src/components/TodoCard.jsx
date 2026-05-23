@@ -3,6 +3,7 @@ import { format, isPast, isToday, isTomorrow, differenceInDays } from 'date-fns'
 import { Trash2, ExternalLink, ChevronDown } from 'lucide-react'
 import { todos as todoCommands } from '../commands/index.js'
 import ContentRenderer from './ContentRenderer.jsx'
+import { useMutation } from '../hooks/index.js'
 
 function DateLabel({ date }) {
   if (!date) return null
@@ -25,25 +26,14 @@ function DateLabel({ date }) {
 
 export default function TodoCard({ todo, category, onEdit }) {
   const [expanded, setExpanded] = useState(false)
-  const [checking, setChecking] = useState(false)
   const catColor = category?.color || 'var(--amber)'
 
   const hasMedia = todo.metadata?.mediaType
   const hasBook = todo.metadata?.googleId
   const hasExtras = todo.notes || todo.url || todo.metadata?.overview || todo.metadata?.description
 
-  async function toggleDone() {
-    setChecking(true)
-    try {
-      await todoCommands.toggleTodo(todo.id)
-    } finally {
-      setTimeout(() => setChecking(false), 300)
-    }
-  }
-
-  async function deleteTodo() {
-    await todoCommands.deleteTodo(todo.id)
-  }
+  const { mutate: toggleDone, isLoading: checking } = useMutation(() => todoCommands.toggleTodo(todo.id))
+  const { mutate: deleteTodo } = useMutation(() => todoCommands.deleteTodo(todo.id))
 
   return (
     <div

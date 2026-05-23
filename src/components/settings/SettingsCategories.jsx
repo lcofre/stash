@@ -3,6 +3,7 @@ import { Trash2, Plus } from 'lucide-react'
 import { useCategories } from '../../hooks/index.js'
 import { categories as categoryCommands } from '../../commands/index.js'
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '../../db/index.js'
+import { useProfileId } from '../../contexts/ProfileContext.jsx'
 
 const label = (text) => (
   <span style={{ fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)', display: 'block', marginBottom: '8px' }}>
@@ -10,7 +11,8 @@ const label = (text) => (
   </span>
 )
 
-export default function SettingsCategories({ profileId }) {
+export default function SettingsCategories() {
+  const profileId = useProfileId()
   const [adding, setAdding] = useState(false)
   const [newName, setNewName] = useState('')
   const [newIcon, setNewIcon] = useState('📝')

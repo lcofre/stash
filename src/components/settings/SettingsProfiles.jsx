@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Trash2, UserPlus } from 'lucide-react'
 import { profiles as profileCommands } from '../../commands/index.js'
+import { useProfileId } from '../../contexts/ProfileContext.jsx'
 
-export default function SettingsProfiles({ profileId, profiles, onSwitchProfile, onProfileCreated, onClose }) {
+export default function SettingsProfiles({ profiles, onSwitchProfile, onProfileCreated, onClose }) {
+  const profileId = useProfileId()
   const [newName, setNewName] = useState('')
   const [creating, setCreating] = useState(false)
   const [editingId, setEditingId] = useState(null)

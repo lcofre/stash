@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { SlidersHorizontal, Plus } from 'lucide-react'
 import { useProfileList } from './hooks/index.js'
+import { ProfileProvider } from './contexts/ProfileContext.jsx'
 
 function GithubIcon({ size = 16 }) {
   return (
@@ -92,76 +93,73 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)' }}>
-        <Header profile={activeProfile} onSettings={() => setShowSettings(true)} />
+    <ProfileProvider profileId={activeProfileId}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)' }}>
+          <Header profile={activeProfile} onSettings={() => setShowSettings(true)} />
 
-        <CategoryTabs
-          profileId={activeProfileId}
-          activeCategoryId={activeCategoryId}
-          onSelect={setActiveCategoryId}
-        />
+          <CategoryTabs
+            activeCategoryId={activeCategoryId}
+            onSelect={setActiveCategoryId}
+          />
 
-        <TodoList
-          profileId={activeProfileId}
-          categoryId={activeCategoryId}
-          onAdd={() => setShowAddModal(true)}
-          onEdit={(todoId) => setEditingTodoId(todoId)}
-        />
+          <TodoList
+            categoryId={activeCategoryId}
+            onAdd={() => setShowAddModal(true)}
+            onEdit={(todoId) => setEditingTodoId(todoId)}
+          />
 
-      {/* FAB */}
-      <button
-        onClick={() => setShowAddModal(true)}
-        aria-label="Add item"
-        style={{
-          position: 'fixed', bottom: '24px', right: '22px',
-          width: '56px', height: '56px',
-          background: 'var(--amber)',
-          borderRadius: '50%',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#0c0b0f',
-          boxShadow: '0 4px 16px rgba(212,168,86,0.25)',
-          transition: 'background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
-          zIndex: 40,
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.background = 'var(--amber-2)'
-          e.currentTarget.style.boxShadow = '0 8px 24px rgba(212,168,86,0.35)'
-          e.currentTarget.style.transform = 'scale(1.05)'
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.background = 'var(--amber)'
-          e.currentTarget.style.boxShadow = '0 4px 16px rgba(212,168,86,0.25)'
-          e.currentTarget.style.transform = 'scale(1)'
-        }}
-      >
-        <Plus size={24} strokeWidth={2.2} />
-      </button>
+        {/* FAB */}
+        <button
+          onClick={() => setShowAddModal(true)}
+          aria-label="Add item"
+          style={{
+            position: 'fixed', bottom: '24px', right: '22px',
+            width: '56px', height: '56px',
+            background: 'var(--amber)',
+            borderRadius: '50%',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#0c0b0f',
+            boxShadow: '0 4px 16px rgba(212,168,86,0.25)',
+            transition: 'background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
+            zIndex: 40,
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = 'var(--amber-2)'
+            e.currentTarget.style.boxShadow = '0 8px 24px rgba(212,168,86,0.35)'
+            e.currentTarget.style.transform = 'scale(1.05)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'var(--amber)'
+            e.currentTarget.style.boxShadow = '0 4px 16px rgba(212,168,86,0.25)'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+        >
+          <Plus size={24} strokeWidth={2.2} />
+        </button>
 
-      {showAddModal && (
-        <AddTodoModal
-          profileId={activeProfileId}
-          categoryId={activeCategoryId !== '__calendar__' ? activeCategoryId : null}
-          onClose={() => setShowAddModal(false)}
-        />
-      )}
-      {editingTodo && (
-        <EditTodoModal
-          profileId={activeProfileId}
-          todo={editingTodo}
-          onClose={() => setEditingTodoId(null)}
-        />
-      )}
-      {showSettings && (
-        <SettingsModal
-          profileId={activeProfileId}
-          profiles={profiles}
-          onClose={() => setShowSettings(false)}
-          onSwitchProfile={(id) => { setActiveProfileId(id); setActiveCategoryId(null) }}
-          onProfileCreated={(id) => { setActiveProfileId(id); setActiveCategoryId(null) }}
-        />
-      )}
-      </div>
+        {showAddModal && (
+          <AddTodoModal
+            categoryId={activeCategoryId !== '__calendar__' ? activeCategoryId : null}
+            onClose={() => setShowAddModal(false)}
+          />
+        )}
+        {editingTodo && (
+          <EditTodoModal
+            todo={editingTodo}
+            onClose={() => setEditingTodoId(null)}
+          />
+        )}
+        {showSettings && (
+          <SettingsModal
+            profiles={profiles}
+            onClose={() => setShowSettings(false)}
+            onSwitchProfile={(id) => { setActiveProfileId(id); setActiveCategoryId(null) }}
+            onProfileCreated={(id) => { setActiveProfileId(id); setActiveCategoryId(null) }}
+          />
+        )}
+        </div>
+    </ProfileProvider>
   )
 }

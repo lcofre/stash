@@ -4,10 +4,12 @@ import SettingsCategories from './settings/SettingsCategories.jsx'
 import SettingsProfiles from './settings/SettingsProfiles.jsx'
 import SettingsAPI from './settings/SettingsAPI.jsx'
 import SettingsData from './settings/SettingsData.jsx'
+import { useProfileId } from '../contexts/ProfileContext.jsx'
 
 const TABS = ['Categories', 'Profiles', 'API Keys', 'Data']
 
-export default function SettingsModal({ profileId, profiles, onClose, onSwitchProfile, onProfileCreated }) {
+export default function SettingsModal({ profiles, onClose, onSwitchProfile, onProfileCreated }) {
+  const profileId = useProfileId()
   const [activeTab, setActiveTab] = useState('Categories')
 
   return (
@@ -44,10 +46,10 @@ export default function SettingsModal({ profileId, profiles, onClose, onSwitchPr
       </div>
 
       <div style={{ padding: '20px' }}>
-        {activeTab === 'Categories' && <SettingsCategories profileId={profileId} />}
-        {activeTab === 'Profiles' && <SettingsProfiles profileId={profileId} profiles={profiles} onSwitchProfile={onSwitchProfile} onProfileCreated={onProfileCreated} onClose={onClose} />}
-        {activeTab === 'API Keys' && <SettingsAPI profileId={profileId} />}
-        {activeTab === 'Data' && <SettingsData profileId={profileId} />}
+        {activeTab === 'Categories' && <SettingsCategories />}
+        {activeTab === 'Profiles' && <SettingsProfiles profiles={profiles} onSwitchProfile={onSwitchProfile} onProfileCreated={onProfileCreated} onClose={onClose} />}
+        {activeTab === 'API Keys' && <SettingsAPI />}
+        {activeTab === 'Data' && <SettingsData />}
       </div>
     </Modal>
   )

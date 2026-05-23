@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Download, Upload } from 'lucide-react'
 import { exportProfile, importProfile } from '../../db/index.js'
+import { useProfileId } from '../../contexts/ProfileContext.jsx'
 
 const label = (text) => (
   <span style={{ fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)', display: 'block', marginBottom: '8px' }}>
@@ -8,7 +9,8 @@ const label = (text) => (
   </span>
 )
 
-export default function SettingsData({ profileId }) {
+export default function SettingsData() {
+  const profileId = useProfileId()
   const [importing, setImporting] = useState(false)
   const [msg, setMsg] = useState('')
 

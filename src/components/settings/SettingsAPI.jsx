@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useSettings } from '../../hooks/index.js'
 import { updateApiKey } from '../../commands/settings.js'
+import { useProfileId } from '../../contexts/ProfileContext.jsx'
 
 const label = (text) => (
   <span style={{ fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)', display: 'block', marginBottom: '8px' }}>
@@ -9,7 +10,8 @@ const label = (text) => (
   </span>
 )
 
-export default function SettingsAPI({ profileId }) {
+export default function SettingsAPI() {
+  const profileId = useProfileId()
   const settings = useSettings(profileId)
   const [showTmdb, setShowTmdb] = useState(false)
   const [showOmdb, setShowOmdb] = useState(false)

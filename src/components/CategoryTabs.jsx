@@ -1,6 +1,8 @@
 import { useCategories } from '../hooks/index.js'
+import { useProfileId } from '../contexts/ProfileContext.jsx'
 
-export default function CategoryTabs({ profileId, activeCategoryId, onSelect }) {
+export default function CategoryTabs({ activeCategoryId, onSelect }) {
+  const profileId = useProfileId()
   const categories = useCategories(profileId)
 
   if (!categories) {

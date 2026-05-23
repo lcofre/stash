@@ -1,44 +1,43 @@
-import { useState } from 'react'
 import { Link } from 'lucide-react'
 import Modal from './ui/Modal.jsx'
 import WatchEnricher from './enrichers/WatchEnricher.jsx'
 import ReadEnricher from './enrichers/ReadEnricher.jsx'
-import { useCategories, useTodoForm } from '../hooks/index.js'
+import { useCategories, useTodoForm, useMutation } from '../hooks/index.js'
 import { todos as todoCommands } from '../commands/index.js'
+import { useProfileId } from '../contexts/ProfileContext.jsx'
 
 const labelStyle = {
   fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)',
   display: 'block', marginBottom: '8px',
 }
 
-export default function AddTodoModal({ profileId, categoryId, onClose }) {
+export default function AddTodoModal({ categoryId, onClose }) {
+  const profileId = useProfileId()
   const { form, updateField, changeCategoryId } = useTodoForm(null)
-  const [saving, setSaving] = useState(false)
 
   const categories = useCategories(profileId)
 
   const activeCategory = categories?.find(c => c.id === (form.categoryId || categoryId)) || categories?.[0]
   const type = activeCategory?.type || 'todo'
 
+  const { mutate: save, isLoading: saving } = useMutation(async (payload) => {
+    await todoCommands.addTodo(payload)
+    onClose()
+  })
+
   async function handleSubmit(e) {
     e.preventDefault()
     const finalTitle = form.title.trim() || form.metadata?.title || ''
     if (!finalTitle) return
-    setSaving(true)
-    try {
-      await todoCommands.addTodo({
-        profileId,
-        categoryId: activeCategory?.id,
-        title: finalTitle,
-        notes: form.notes.trim(),
-        date: form.date ? new Date(form.date + 'T12:00:00') : null,
-        url: form.url.trim() || null,
-        metadata: form.metadata || null,
-      })
-      onClose()
-    } finally {
-      setSaving(false)
-    }
+    await save({
+      profileId,
+      categoryId: activeCategory?.id,
+      title: finalTitle,
+      notes: form.notes.trim(),
+      date: form.date ? new Date(form.date + 'T12:00:00') : null,
+      url: form.url.trim() || null,
+      metadata: form.metadata || null,
+    })
   }
 
   return (
