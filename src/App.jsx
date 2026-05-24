@@ -16,8 +16,7 @@ import { db } from './db/index.js'
 import ProfileSelector from './components/ProfileSelector.jsx'
 import CategoryTabs from './components/CategoryTabs.jsx'
 import TodoList from './components/TodoList.jsx'
-import AddTodoModal from './components/AddTodoModal.jsx'
-import EditTodoModal from './components/EditTodoModal.jsx'
+import TodoFormModal from './components/TodoFormModal.jsx'
 import SettingsModal from './components/SettingsModal.jsx'
 
 function Header({ profile, onSettings }) {
@@ -141,13 +140,15 @@ export default function App() {
         </button>
 
         {showAddModal && (
-          <AddTodoModal
+          <TodoFormModal
+            mode="add"
             categoryId={activeCategoryId !== VIEW_MODES.CALENDAR ? activeCategoryId : null}
             onClose={() => setShowAddModal(false)}
           />
         )}
         {editingTodo && (
-          <EditTodoModal
+          <TodoFormModal
+            mode="edit"
             todo={editingTodo}
             onClose={() => setEditingTodoId(null)}
           />

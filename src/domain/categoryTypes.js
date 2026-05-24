@@ -44,23 +44,9 @@ export function getRenderer(categoryType) {
   return RENDERER_REGISTRY[categoryType] || DEFAULT_RENDERER
 }
 
-// Enrichers (return the component to render)
-// These are lazy-loaded to avoid circular dependencies
-let enricherCache = {}
-
-export function getEnricher(categoryType) {
-  if (enricherCache[categoryType]) return enricherCache[categoryType]
-
-  let enricher = null
-  if (categoryType === CATEGORY_TYPES.WATCH) {
-    enricher = require('../components/enrichers/WatchEnricher').default
-  } else if (categoryType === CATEGORY_TYPES.READ) {
-    enricher = require('../components/enrichers/ReadEnricher').default
-  }
-
-  if (enricher) enricherCache[categoryType] = enricher
-  return enricher || null
-}
+// Enrichers (React components) live in `src/enricherRegistry.js`.
+// `domain/` must not import React components, so `getEnricher` is exposed
+// from the registry module instead — break the previous circular dependency.
 
 // Metadata validation
 export function validateMetadata(metadata, categoryType) {
