@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.11.1](https://github.com/lcofre/stash/compare/v0.11.0...v0.11.1) (2026-05-24)
+
+### Refactoring
+
+* dispatch ContentRenderer on category type ([#30](https://github.com/lcofre/stash/issues/30)) ([2ba4700](https://github.com/lcofre/stash/commit/2ba47009ef6d88ceb34c3b799d186b9e9d12aa3b))
+* merge AddTodoModal + EditTodoModal into TodoFormModal ([#29](https://github.com/lcofre/stash/issues/29)) ([778593a](https://github.com/lcofre/stash/commit/778593a61b440c85305037e93a5f6ea4a1ee24e2))
+
 ## [0.11.0](https://github.com/lcofre/stash/compare/v0.10.4...v0.11.0) (2026-05-23)
 
 ### Features
