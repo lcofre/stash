@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { validateMetadata } from '../domain/categoryTypes.js'
 
-// Unified form state management for both add and edit modals
-// Consolidates form state that was previously duplicated across AddTodoModal and EditTodoModal
+// Unified form state management for add and edit flows in TodoFormModal.
 export function useTodoForm(initialTodo = null) {
   const [form, setForm] = useState({
     title: '',

@@ -1,27 +1,35 @@
+import { createElement } from 'react'
 import { Link } from 'lucide-react'
 import Modal from './ui/Modal.jsx'
-import WatchEnricher from './enrichers/WatchEnricher.jsx'
-import ReadEnricher from './enrichers/ReadEnricher.jsx'
 import { useCategories, useTodoForm, useMutation } from '../hooks/index.js'
 import { todos as todoCommands } from '../commands/index.js'
 import { useProfileId } from '../contexts/ProfileContext.jsx'
+import { getEnricher } from '../enricherRegistry.js'
 
 const labelStyle = {
   fontFamily: 'var(--font-ui)', fontSize: '12px', color: 'var(--text-3)',
   display: 'block', marginBottom: '8px',
 }
 
-export default function EditTodoModal({ todo, onClose }) {
+export default function TodoFormModal({ mode, todo = null, categoryId = null, onClose }) {
+  const isEdit = mode === 'edit'
   const profileId = useProfileId()
-  const { form, updateField, changeCategoryId } = useTodoForm(todo)
+  const { form, updateField, changeCategoryId } = useTodoForm(isEdit ? todo : null)
 
   const categories = useCategories(profileId)
 
-  const activeCategory = categories?.find(c => c.id === form.categoryId) || categories?.[0]
+  const activeCategory = isEdit
+    ? (categories?.find(c => c.id === form.categoryId) || categories?.[0])
+    : (categories?.find(c => c.id === (form.categoryId || categoryId)) || categories?.[0])
   const type = activeCategory?.type || 'todo'
+  const enricher = getEnricher(type)
 
   const { mutate: save, isLoading: saving } = useMutation(async (payload) => {
-    await todoCommands.updateTodo(todo.id, payload)
+    if (isEdit) {
+      await todoCommands.updateTodo(todo.id, payload)
+    } else {
+      await todoCommands.addTodo(payload)
+    }
     onClose()
   })
 
@@ -29,18 +37,20 @@ export default function EditTodoModal({ todo, onClose }) {
     e.preventDefault()
     const finalTitle = form.title.trim() || form.metadata?.title || ''
     if (!finalTitle) return
-    await save({
+    const basePayload = {
       title: finalTitle,
-      categoryId: form.categoryId || activeCategory?.id,
-      notes: form.notes.trim() || null,
+      categoryId: isEdit ? (form.categoryId || activeCategory?.id) : activeCategory?.id,
+      notes: isEdit ? (form.notes.trim() || null) : form.notes.trim(),
       date: form.date ? new Date(form.date + 'T12:00:00') : null,
       url: form.url.trim() || null,
       metadata: form.metadata || null,
-    })
+    }
+    const payload = isEdit ? basePayload : { profileId, ...basePayload }
+    await save(payload)
   }
 
   return (
-    <Modal title="edit" onClose={onClose}>
+    <Modal title={isEdit ? 'edit' : 'add to stash'} onClose={onClose}>
       <form onSubmit={handleSubmit} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
         {/* Category chips */}
@@ -76,24 +86,22 @@ export default function EditTodoModal({ todo, onClose }) {
           </div>
         )}
 
-        {/* Enricher section */}
-        {type === 'watch' && (
+        {/* Enricher section — component looked up from the registry by category type */}
+        {enricher && (
           <div>
             <span style={labelStyle}>find it</span>
-            <WatchEnricher profileId={profileId} value={form.metadata} onChange={m => updateField('metadata', m)} />
-          </div>
-        )}
-        {type === 'read' && (
-          <div>
-            <span style={labelStyle}>find it</span>
-            <ReadEnricher value={form.metadata} onChange={m => updateField('metadata', m)} />
+            {createElement(enricher, {
+              profileId,
+              value: form.metadata,
+              onChange: m => updateField('metadata', m),
+            })}
           </div>
         )}
 
         {/* Title */}
         <div>
           <span style={labelStyle}>
-            {type === 'watch' || type === 'read' ? 'or type manually' : 'title'}
+            {enricher ? 'or type manually' : 'title'}
           </span>
           <input
             value={form.title}
@@ -106,7 +114,7 @@ export default function EditTodoModal({ todo, onClose }) {
             }
             className="field accent-focus"
             required={!form.metadata}
-            autoFocus={type !== 'watch' && type !== 'read'}
+            autoFocus={!enricher}
           />
         </div>
 
@@ -163,7 +171,7 @@ export default function EditTodoModal({ todo, onClose }) {
             className="btn btn-primary"
             style={{ flex: 2 }}
           >
-            update →
+            {isEdit ? 'update →' : 'stash it →'}
           </button>
         </div>
       </form>
