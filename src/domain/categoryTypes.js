@@ -33,6 +33,17 @@ const METADATA_SCHEMAS = {
   },
 }
 
+// Renderers — display the todo's title area. Dispatched on category type
+// rather than fingerprinting `todo.metadata`. The dispatch table lives in
+// `src/rendererRegistry.js` to keep `domain/` free of React imports and to
+// avoid an import cycle (the registry uses string literals, not
+// CATEGORY_TYPES, to stay acyclic — see that file).
+import { RENDERER_REGISTRY, DEFAULT_RENDERER } from '../rendererRegistry.js'
+
+export function getRenderer(categoryType) {
+  return RENDERER_REGISTRY[categoryType] || DEFAULT_RENDERER
+}
+
 // Enrichers (return the component to render)
 // These are lazy-loaded to avoid circular dependencies
 let enricherCache = {}
